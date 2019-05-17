@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>CivelXu&#39;s Blog</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://civelxu.com/"/>
+  <updated>2019-05-17T05:58:25.047Z</updated>
+  <id>http://civelxu.com/</id>
+  
+  <author>
+    <name>Xuxiwen</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>利用 Kingfisher 处理图片</title>
+    <link href="http://civelxu.com/2019/05/16/%E5%88%A9%E7%94%A8%20Kingfisher%20%E5%A4%84%E7%90%86%E5%9B%BE%E7%89%87/"/>
+    <id>http://civelxu.com/2019/05/16/利用 Kingfisher 处理图片/</id>
+    <published>2019-05-16T09:23:20.000Z</published>
+    <updated>2019-05-17T05:58:25.047Z</updated>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;基础配置&lt;figure class=&quot;highlight go&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;KingfisherDefaultOptionsInfoItem&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt; -&amp;gt; [&lt;span class=&quot;title&quot;&gt;KingfisherOptionsInfoItem&lt;/span&gt;]&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; [.transition(.fade(&lt;span class=&quot;number&quot;&gt;0.2&lt;/span&gt;)),&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            .keepCurrentImageWhileLoading,&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            .cacheSerializer(FormatIndicatedCacheSerializer.png)]&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Kingfisher" scheme="http://civelxu.com/categories/Kingfisher/"/>
+    
+    
+      <category term="Kingfisher" scheme="http://civelxu.com/tags/Kingfisher/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>iOS 多个Target保持版本号一致的设置</title>
+    <link href="http://civelxu.com/2019/04/24/iOS%20%E5%A4%9A%E4%B8%AATarget%E4%BF%9D%E6%8C%81%E7%89%88%E6%9C%AC%E5%8F%B7%E4%B8%80%E8%87%B4%E7%9A%84%E8%AE%BE%E7%BD%AE/"/>
+    <id>http://civelxu.com/2019/04/24/iOS 多个Target保持版本号一致的设置/</id>
+    <published>2019-04-24T05:38:20.000Z</published>
+    <updated>2019-05-17T05:56:13.145Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h3&gt;&lt;p&gt;在 App 上传到 App Store Content 审查过程中, 我们可能会遇到如下警告错误,  通常会发送邮件给我们。 &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Dear Developer,&lt;/p&gt;
+&lt;p&gt;We identified one or more issues with a recent delivery for your app, “Awesome App”. Your delivery was successful, but you may wish to correct the following issues in your next delivery:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CFBundleVersion Mismatch&lt;/strong&gt; - The CFBundleVersion value ‘8’ of extension ‘Awesome.app/PlugIns/Awesome.app-share.appex’ does not match the CFBundleVersion value ‘10’ of its containing iOS application ‘Awesome.app’.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CFBundleVersion Mismatch&lt;/strong&gt; - The CFBundleVersion value ‘8’ of extension ‘Awesome.app/PlugIns/Awesome.app.widget.appex’ does not match the CFBundleVersion value ‘10’ of its containing iOS application ‘Awesome.app’.&lt;/p&gt;
+&lt;p&gt;After you’ve corrected the issues, you can use Xcode or Application Loader to upload a new binary to App Store Connect.&lt;/p&gt;
+&lt;p&gt;Best regards,&lt;/p&gt;
+&lt;p&gt;The App Store Team&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;正常情况下我们通过手动修改多个target版本或者build号保持一致, 重新上传即可解决问题。这里我尝试来实现了一种自动设置的方式, 能够避免每次都手动设置的烦恼。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Version" scheme="http://civelxu.com/categories/Version/"/>
+    
+    
+      <category term="Target" scheme="http://civelxu.com/tags/Target/"/>
+    
+      <category term="Version" scheme="http://civelxu.com/tags/Version/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AsyncDisplayKit 初窥</title>
+    <link href="http://civelxu.com/2017/09/28/AsyncDisplayKit%20%E5%88%9D%E7%AA%A5/"/>
+    <id>http://civelxu.com/2017/09/28/AsyncDisplayKit 初窥/</id>
+    <published>2017-09-28T03:41:10.000Z</published>
+    <updated>2019-05-17T05:40:58.433Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;了解-AsyncDisplayKit&quot;&gt;&lt;a href=&quot;#了解-AsyncDisplayKit&quot; class=&quot;headerlink&quot; title=&quot;了解 AsyncDisplayKit&quot;&gt;&lt;/a&gt;了解 AsyncDisplayKit&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;AsyncDisplayKit的基本单位是节点 Node。一个Asdisplaynode 是 UIView 的抽象，反过来是CALayer抽象。与只能在主线程上使用的 UIView 视图不同，节点是线程安全的：您可以在后台线程上并行地实例化和配置它们的整个层次结构。&lt;br&gt;为了保持它的用户界面流畅和响应，你的应用程序应该以每秒60帧的速度呈现。这意味着主线程有六十分之一秒把每帧。这是16毫秒执行所有的布局和绘图代码！而且由于系统开销，您的代码通常不到十毫秒才能运行它导致帧下降。&lt;br&gt;AsyncDisplayKit 让你 Image 解码、文本大小和渲染，布局，和其他昂贵的UI操作关闭主线程，让主线程可以响应用户交互。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这段话翻译于 &lt;strong&gt;AsyncDisplayKit&lt;/strong&gt; GitHub 的介绍, 我们可以 通过 &lt;code&gt;CocoaPods&lt;/code&gt; or &lt;code&gt;Carthage&lt;/code&gt; 安装使用; 另外 目前  AsyncDisplayKit 已经改名为 &lt;strong&gt;Texture&lt;/strong&gt;。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Texture" scheme="http://civelxu.com/categories/Texture/"/>
+    
+    
+      <category term="AsyncDisplayKit" scheme="http://civelxu.com/tags/AsyncDisplayKit/"/>
+    
+      <category term="Texture" scheme="http://civelxu.com/tags/Texture/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>iOS 使用 Lame 转码 MP3 的最正确姿势</title>
+    <link href="http://civelxu.com/2017/07/18/iOS%20%E4%BD%BF%E7%94%A8%20Lame%20%E8%BD%AC%E7%A0%81%20MP3%20%E7%9A%84%E6%9C%80%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF/"/>
+    <id>http://civelxu.com/2017/07/18/iOS 使用 Lame 转码 MP3 的最正确姿势/</id>
+    <published>2017-07-18T02:16:47.000Z</published>
+    <updated>2019-05-17T05:53:48.732Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;最近在项目中, 做有关 &lt;strong&gt;AVAudioRecorder&lt;/strong&gt; 的录音开发, 需要把录制的格式转成 MP3, 遇到了转码之后的MP3文件, 无法获取正确的时长问题. &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;为了解决这个问题, 真的是反复来修改录音配置, 浪费了不知道多少的时间来分析这个问题. &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;中间我去某某群去找大神提问问题,结果遭到了鄙视, 都统统质疑我的录音配置, 最后甩给我一个demo, 结果我一测试, 也是一样的问题, 我就呵呵了.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;所以, 我今天来写一篇文章来认真剖析这个问题, 为什么起名 ? &lt;strong&gt;iOS 使用 Lame 转码 MP3 的最正确姿势 !&lt;/strong&gt; 是因为我在百度搜索到的各种有关于 &lt;strong&gt;Lame&lt;/strong&gt; 转码的代码, 至少很大一部分 都是不完全正确的.&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="AVAudioRecorder" scheme="http://civelxu.com/categories/AVAudioRecorder/"/>
+    
+    
+      <category term="Lame" scheme="http://civelxu.com/tags/Lame/"/>
+    
+      <category term="AVAudioRecorder" scheme="http://civelxu.com/tags/AVAudioRecorder/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AlertViewController 的快速调用，看我就够了。</title>
+    <link href="http://civelxu.com/2017/03/31/AlertViewController%20%E7%9A%84%E5%BF%AB%E9%80%9F%E8%B0%83%E7%94%A8%EF%BC%8C%E7%9C%8B%E6%88%91%E5%B0%B1%E5%A4%9F%E4%BA%86/"/>
+    <id>http://civelxu.com/2017/03/31/AlertViewController 的快速调用，看我就够了/</id>
+    <published>2017-03-31T11:33:06.000Z</published>
+    <updated>2019-05-17T05:47:22.506Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Alert 在iOS开发中，是一个经常用到的控件。iOS原生的API中的写法，我这里就不吐槽了，无论是AlertView 还是AlertViewcontroller 都需要很多代码来调用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;网上有很多关于AlertView的封装，再加上这是个已经被废弃的控件。我这里就不来叙述。这里提供一个我自己实现的AlertViewController的快速调用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;看下图，我猜还有很多人，还在用着废弃的Alert，忍受着 ⚠️⚠️⚠️&lt;br&gt; &lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1805099-d858de2787e595be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375&quot; alt=&quot;警告视图&quot;&gt;&lt;/p&gt;
+&lt;p&gt;好了下面就直接上代码的使用 &amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; &lt;/p&gt;
+    
+    </summary>
+    
+      <category term="AlertViewController" scheme="http://civelxu.com/categories/AlertViewController/"/>
+    
+    
+      <category term="AlertViewController" scheme="http://civelxu.com/tags/AlertViewController/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>iOS 基础知识(面试)深度理解</title>
+    <link href="http://civelxu.com/2016/06/28/iOS%20%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86(%E9%9D%A2%E8%AF%95)%E6%B7%B1%E5%BA%A6%E7%90%86%E8%A7%A3/"/>
+    <id>http://civelxu.com/2016/06/28/iOS 基础知识(面试)深度理解/</id>
+    <published>2016-06-28T13:07:20.000Z</published>
+    <updated>2019-05-17T05:51:43.187Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;什么是KVC-什么是KVO-他们之间关系-底层实现&quot;&gt;&lt;a href=&quot;#什么是KVC-什么是KVO-他们之间关系-底层实现&quot; class=&quot;headerlink&quot; title=&quot;什么是KVC,什么是KVO,他们之间关系.底层实现&quot;&gt;&lt;/a&gt;什么是KVC,什么是KVO,他们之间关系.底层实现&lt;/h2&gt;&lt;p&gt; &lt;strong&gt;键值编码 Key-Value-Coding(KVC)&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;键值编码是一种使用字符串来标识属性，间接访问对象的属性，而不是通过调用存取方法，直接或通过实例变量访问的机制，非对象类型的变量将被自动封装或者解封成对象，很多情况下会简化程序代码；KVC的缺点：一旦使用 KVC 你的编译器无法检查出错误,即不会对设置的键、键路径进行错误检查,且执行效率要低于合成存取器方法和自定的 setter 和 getter 方法。因为使用 KVC 键值编码,它必须先解析字符串,然后在设置或者访问对象的实例变量。&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+      <category term="iOS面试" scheme="http://civelxu.com/categories/iOS%E9%9D%A2%E8%AF%95/"/>
+    
+    
+      <category term="iOS面试" scheme="http://civelxu.com/tags/iOS%E9%9D%A2%E8%AF%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CATransition 自定义转场动画</title>
+    <link href="http://civelxu.com/2016/06/24/iOS%20CATransition%20%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BD%AC%E5%9C%BA%E5%8A%A8%E7%94%BB/"/>
+    <id>http://civelxu.com/2016/06/24/iOS CATransition 自定义转场动画/</id>
+    <published>2016-06-24T10:24:35.000Z</published>
+    <updated>2019-05-17T05:47:52.441Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;##CATransition&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;CATransition 是CAAnimation的子类（如下图所示），用于控制器和控制器之间的转场动画。能够来自定义系统的push和present。实现页面间的动画效果。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/1805099-c6b948be1080a8e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;CAAnimation 关系图&quot;&gt;&lt;/p&gt;
+&lt;p&gt;####转场动画就是从一个场景以动画的形式过渡到另一个场景。转场动画的使用一般分为以下几个步骤：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;创建转场动画&lt;/li&gt;
+&lt;li&gt;设置转场类型、子类型（可选）及其他属性画&lt;/li&gt;
+&lt;li&gt;设置转场后的新视图并添加动画到图层&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ios的画面切换的动画效果的API主要通过调用系统已定义的动画效果实现，这些效果已基本囊括开发的需求，如果需要更加复杂的效果，可以考虑CATransition来实现。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Animation" scheme="http://civelxu.com/categories/Animation/"/>
+    
+    
+      <category term="CATransition" scheme="http://civelxu.com/tags/CATransition/"/>
+    
+  </entry>
+  
+</feed>
