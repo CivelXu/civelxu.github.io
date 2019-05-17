@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言 最近在项目中, 做有关 AVAudioRecorder 的录音开发, 需要把录制的格式转成 MP3, 遇到了转码之后的MP3文件, 无法获取正确的时长问题.   为了解决这个问题, 真的是反复来修改录音配置, 浪费了不知道多少的时间来分析这个问题.   中间我去某某群去找大神提问问题,结果遭到了鄙视, 都统统质疑我的录音配置, 最后甩给我一个demo, 结果我一测试, 也是一样的问题, 我就">
+<meta name="keywords" content="Lame,AVAudioRecorder">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 使用 Lame 转码 MP3 的最正确姿势">
+<meta property="og:url" content="http://civelxu.com/2017/07/18/iOS 使用 Lame 转码 MP3 的最正确姿势/index.html">
+<meta property="og:site_name" content="CivelXu&#39;s Blog">
+<meta property="og:description" content="前言 最近在项目中, 做有关 AVAudioRecorder 的录音开发, 需要把录制的格式转成 MP3, 遇到了转码之后的MP3文件, 无法获取正确的时长问题.   为了解决这个问题, 真的是反复来修改录音配置, 浪费了不知道多少的时间来分析这个问题.   中间我去某某群去找大神提问问题,结果遭到了鄙视, 都统统质疑我的录音配置, 最后甩给我一个demo, 结果我一测试, 也是一样的问题, 我就">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-05-17T05:53:48.732Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS 使用 Lame 转码 MP3 的最正确姿势">
+<meta name="twitter:description" content="前言 最近在项目中, 做有关 AVAudioRecorder 的录音开发, 需要把录制的格式转成 MP3, 遇到了转码之后的MP3文件, 无法获取正确的时长问题.   为了解决这个问题, 真的是反复来修改录音配置, 浪费了不知道多少的时间来分析这个问题.   中间我去某某群去找大神提问问题,结果遭到了鄙视, 都统统质疑我的录音配置, 最后甩给我一个demo, 结果我一测试, 也是一样的问题, 我就">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://civelxu.com/2017/07/18/iOS 使用 Lame 转码 MP3 的最正确姿势/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>iOS 使用 Lame 转码 MP3 的最正确姿势 | CivelXu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CivelXu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://civelxu.com/2017/07/18/iOS 使用 Lame 转码 MP3 的最正确姿势/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xuxiwen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CivelXu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS 使用 Lame 转码 MP3 的最正确姿势
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-07-18 10:16:47" itemprop="dateCreated datePublished" datetime="2017-07-18T10:16:47+08:00">2017-07-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-17 13:53:48" itemprop="dateModified" datetime="2019-05-17T13:53:48+08:00">2019-05-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/AVAudioRecorder/" itemprop="url" rel="index"><span itemprop="name">AVAudioRecorder</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><ul>
+<li><p>最近在项目中, 做有关 <strong>AVAudioRecorder</strong> 的录音开发, 需要把录制的格式转成 MP3, 遇到了转码之后的MP3文件, 无法获取正确的时长问题. </p>
+</li>
+<li><p>为了解决这个问题, 真的是反复来修改录音配置, 浪费了不知道多少的时间来分析这个问题. </p>
+</li>
+<li><p>中间我去某某群去找大神提问问题,结果遭到了鄙视, 都统统质疑我的录音配置, 最后甩给我一个demo, 结果我一测试, 也是一样的问题, 我就呵呵了.</p>
+</li>
+<li><p>所以, 我今天来写一篇文章来认真剖析这个问题, 为什么起名 ? <strong>iOS 使用 Lame 转码 MP3 的最正确姿势 !</strong> 是因为我在百度搜索到的各种有关于 <strong>Lame</strong> 转码的代码, 至少很大一部分 都是不完全正确的.</p>
+<a id="more"></a>
+
+</li>
+</ul>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>我将会在本篇文章分析以下几点内容</p>
+<ul>
+<li>AVAudioRecorder 配置 和 Lame 编码压缩配置 </li>
+<li>解决录音时长读取不正确的问题</li>
+<li>边录制边转码的实现</li>
+<li>测试 Demo</li>
+</ul>
+<h2 id="AVAudioRecorder-配置-和-Lame-编码压缩配置"><a href="#AVAudioRecorder-配置-和-Lame-编码压缩配置" class="headerlink" title="AVAudioRecorder 配置 和 Lame 编码压缩配置"></a>AVAudioRecorder 配置 和 Lame 编码压缩配置</h2><h3 id="AVAudioRecorder-配置的注意事项"><a href="#AVAudioRecorder-配置的注意事项" class="headerlink" title="AVAudioRecorder 配置的注意事项"></a>AVAudioRecorder 配置的注意事项</h3><blockquote>
+<p>关于 AVAudioRecorder 录音的相关配置 和 Lame 包的编译工作, 这里忽略不讲, 主要是想说一下需要注意的地方</p>
+</blockquote>
+<ul>
+<li>Lame 的转码压缩, 是把录制的 PCM 转码成 MP3, 所以录制的 <code>AVFormatIDKey</code> 设置成 <code>kAudioFormatLinearPCM</code> , 生成的文件可以是 caf 或者 wav.</li>
+<li><a href="http://baike.baidu.com/link?url=TsCl2mxLZvWORN0CnhwPqjxElPDDREWgTyVrIkxWHyoOjbtYnn2kSW2qaliPHSUCHNOyNFbjRGfKqwmkgn08WK" target="_blank" rel="noopener">caf</a> 文件是 Mac OS X 原本支持的众多音频格式中最新增加的一种. iPhone 短信就是这种格式, 录制出的文件会比较大.</li>
+<li><code>AVNumberOfChannelsKey</code> 必须设置为双声道, 不然转码生成的 MP3 会声音尖锐变声.</li>
+<li><code>AVSampleRateKey</code> 必须保证和转码设置的相同.</li>
+</ul>
+<h3 id="Lame-编码压缩-的相关配置"><a href="#Lame-编码压缩-的相关配置" class="headerlink" title="Lame 编码压缩 的相关配置"></a>Lame 编码压缩 的相关配置</h3><ul>
+<li>我们需要录音源文件路径和生成MP3的路径 <code>FILE *pcm</code>  和 <code>FILE *mp3</code>, </li>
+</ul>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//source 被转换的音频文件位置</span></span><br><span class="line"><span class="keyword">FILE</span> *pcm = fopen([cafFilePath cStringUsingEncoding:<span class="number">1</span>], <span class="string">"rb"</span>);  </span><br><span class="line"><span class="comment">//skip file header 跳过 PCM header 能保证录音的开头没有噪音 </span></span><br><span class="line">fseek(pcm, <span class="number">4</span>*<span class="number">1024</span>,  SEEK_CUR); </span><br><span class="line"><span class="comment">//output 输出生成的Mp3文件位置</span></span><br><span class="line"><span class="keyword">FILE</span> *mp3 = fopen([mp3FilePath cStringUsingEncoding:<span class="number">1</span>], <span class="string">"wb+"</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过 <code>fopen</code> 需要注意打开文件的模式. 👇 是扩展的 的 C 语言的 文件打开模式, 为什么要说这些, 比如 我使用 wb 来打开 mp3, 就意味着我只允许写数据, 而如果你有对文件的读取操作,将会出现错误, 这也是我被坑过的地方. </li>
+</ul>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">C 语言的 文件打开模式</span><br><span class="line"></span><br><span class="line">w+以纯文本方式读写，而wb+是以二进制方式进行读写。</span><br><span class="line">mode说明：</span><br><span class="line">w 打开只写文件，若文件存在则文件长度清为<span class="number">0</span>，即该文件内容会消失。若文件不存在则建立该文件。</span><br><span class="line">w+ 打开可读写文件，若文件存在则文件长度清为零，即该文件内容会消失。若文件不存在则建立该文件。</span><br><span class="line">wb 只写方式打开或新建一个二进制文件，只允许写数据。</span><br><span class="line">wb+ 读写方式打开或建立一个二进制文件，允许读和写。</span><br><span class="line">r 打开只读文件，该文件必须存在，否则报错。</span><br><span class="line">r+ 打开可读写的文件，该文件必须存在，否则报错。</span><br><span class="line">rb+ 读写方式打开一个二进制文件，只允许读写数据。</span><br><span class="line"><span class="keyword">a</span> 以附加的方式打开只写文件。若文件不存在，则会建立该文件，如果文件存在，写入的数据会被加到文件尾，即文件原先的内容会被保留。（<span class="literal">EOF</span>符保留）</span><br><span class="line"><span class="keyword">a</span>+ 以附加方式打开可读写的文件。若文件不存在，则会建立该文件，如果文件存在，写入的数据会被加到文件尾后，即文件原先的内容会被保留。 （原来的<span class="literal">EOF</span>符不保留）</span><br><span class="line">ab+ 读写打开一个二进制文件，允许读或在文件末追加数据。</span><br><span class="line">加入b 字符用来告诉函数库打开的文件为二进制文件，而非纯文字文件。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然后是 <code>lame_init()</code> 来初始化, <code>lame_set_num_channels(lame,1)</code> 默认转码为2双通道, 设置单声道会更大程度减少压缩后文件的体积.</li>
+<li>接下来 是执行一个 do while 的循环来反复读取 <code>FILE* stream</code> , 直到 read != 0 , 结束转码,释放  <code>lame_close(lame); fclose(mp3);  fclose(pcm);</code></li>
+</ul>
+<h2 id="解决录音时长读取不正确的问题"><a href="#解决录音时长读取不正确的问题" class="headerlink" title="解决录音时长读取不正确的问题"></a>解决录音时长读取不正确的问题</h2><blockquote>
+<p>Lame 的转码配置网上有很多, 网上可以搜到很多相关的代码, 作为小白 copy 使用, 由于不懂源码实现,直接拿来用就出现了不可预料的问题. 我出现的播放时间不准确的问题, 无论是 AVPlayer 或者 AVAudioPlayer 均无法读取正确的长度, 要么是多几秒, 要么是少几秒, 还可能是超过10s的的误差, 但是播放的过程中, 定时器的计数 会和 总时间显示不吻合, 就比如 一个显示 2:30 的录音, 活生生 放到了 2:50, 你能想象是多么的尴尬Bug.</p>
+</blockquote>
+<h3 id="问题猜测"><a href="#问题猜测" class="headerlink" title="问题猜测"></a>问题猜测</h3><p><strong>我把录制完成的文件, 使用 iTunes 来播放可以显示出正确的长度, 但是使用 QuickTime Player 会出现和 AVPlayer 一样的错误时长 !!!</strong></p>
+<ul>
+<li><p>所以分析造成这个问题的原因可能是: </p>
+<ul>
+<li><ol>
+<li>AVPlayer 不能正确读取长度</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>MP3的编码出现了错误…</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>然后网上也有人遇到了同样的问题,给出的解决方法是换一种 AVPlayer 读取方法:<br>我总结了 AVPlayer 获取总时长的以下方法 ,结果测试 结果都是相近, </p>
+</li>
+</ul>
+<ul>
+<li>way 1</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CMTime <span class="built_in">time</span> = _player.currentItem.duration;</span><br><span class="line">   <span class="keyword">if</span> (<span class="built_in">time</span>.timescale == <span class="number">0</span>) &#123;</span><br><span class="line"><span class="built_in">       return</span> <span class="number">0</span>;</span><br><span class="line">   &#125;</span><br><span class="line"><span class="built_in">   return</span> <span class="built_in">time</span>.value / <span class="built_in">time</span>.timescale;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>way 2</li>
+</ul>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="built_in">self</span>.player &amp;&amp; <span class="built_in">self</span>.player.currentItem &amp;&amp; <span class="built_in">self</span>.player.currentItem.asset) &#123;</span><br><span class="line">    <span class="keyword">return</span>  CMTimeGetSeconds(<span class="built_in">self</span>.player.currentItem.asset.<span class="built_in">duration</span>);</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>way 3</li>
+</ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">AVURLAsset</span>* audioAsset = [<span class="built_in">AVURLAsset</span> URLAssetWithURL:<span class="keyword">self</span>.playingURL options:<span class="literal">nil</span>];</span><br><span class="line"><span class="built_in">CMTime</span> audioDuration = audioAsset.duration;</span><br><span class="line"><span class="keyword">float</span> audioDurationSeconds = <span class="built_in">CMTimeGetSeconds</span>(audioDuration);</span><br><span class="line"><span class="keyword">return</span> (<span class="built_in">NSInteger</span>)audioDurationSeconds;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>其中 , 使用 <a href="http://blog.csdn.net/qingyuan159/article/details/53085302" target="_blank" rel="noopener">Asset</a> 可以解决获取总时间是 NA 的这种错误情况. 实际中我并没有出现过.</li>
+<li>我的测试中 AVPlayer 使用这几个方法, 均无法得到正确的值, 所以应该就是生成文件的问题了.</li>
+</ul>
+<h3 id="了解MP3编码格式"><a href="#了解MP3编码格式" class="headerlink" title="了解MP3编码格式"></a>了解MP3编码格式</h3><p>然后,通过对<a href="http://blog.csdn.net/xiahouzuoxin/article/details/7860631" target="_blank" rel="noopener">MP3编码格式</a>调研, 了解到如下信息:</p>
+<ul>
+<li>MP3使用的是动态码率方式，而这种方式每一帧的长度应该是不等的。那会不会是 <strong>AVPlayer</strong> 是把文件当做每帧相等的方式来计算的总时间，所以才不对？</li>
+<li>不断输出 AVPlayer duration来看, 每次都会有不同的结果, 而 AVPlayer 是支持Mp3 VBR格式文件播放的。所以应该还是我们的生成的文件有问题</li>
+<li>了解到 MP3 VBR头这个东西,有它记录了整个文件的帧总数量，就能直接算出duration.所以是不是我们Lame编码的时候,没有写入 VBR 头 呢.</li>
+</ul>
+<h3 id="Lame-源码分析"><a href="#Lame-源码分析" class="headerlink" title="Lame 源码分析"></a>Lame 源码分析</h3><ul>
+<li>搜索 Lame 源码 <strong>VBR</strong>关键字可以得到</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  1 = write a Xing VBR header frame.</span></span><br><span class="line"><span class="comment">  default = 1</span></span><br><span class="line"><span class="comment">  this variable must have been added by a Hungarian notation Windows programmer :-)</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> CDECL <span class="title">lame_set_bWriteVbrTag</span><span class="params">(lame_global_flags *, <span class="keyword">int</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> CDECL <span class="title">lame_get_bWriteVbrTag</span><span class="params">(<span class="keyword">const</span> lame_global_flags *)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>源码写的很简单, 就是设置了 <code>gfp-&gt;write_lame_tag</code>值, 看看所有调用 <code>write_lame_tag</code> 的地方吧。第一个就找到了<code>lame_encode_mp3_frame(..)</code>函数。这不就是用来每次灌buffer给lame做MP3编码的方法嘛！也就是说每次都会给给帧添加VBR信息，这和之前看的编码资料描述的一样。</p>
+</li>
+<li><p>接下来, 就是需要找到写入VBR头的函数, 搜索源码可得 <code>PutLameVBR()</code> 被调用在<code>lame_get_lametag_frame()</code>函数里, 然后我们来看看这个函数:</p>
+</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * OPTIONAL:</span><br><span class="line"> * lame_mp3_tags_fid will rewrite a Xing VBR tag <span class="keyword">to</span> <span class="keyword">the</span> mp3 <span class="built_in">file</span> <span class="keyword">with</span> <span class="built_in">file</span></span><br><span class="line"> * pointer fid.  These calls perform forward <span class="keyword">and</span> backwards seeks, so make</span><br><span class="line"> * sure fid <span class="keyword">is</span> a <span class="built_in">real</span> <span class="built_in">file</span>.  Make sure lame_encode_flush has been called,</span><br><span class="line"> * <span class="keyword">and</span> all mp3 data has been written <span class="keyword">to</span> <span class="keyword">the</span> <span class="built_in">file</span> <span class="keyword">before</span> calling this</span><br><span class="line"> * function.</span><br><span class="line"> * NOTE:</span><br><span class="line"> * <span class="keyword">if</span> VBR  tags are turned off <span class="keyword">by</span> <span class="keyword">the</span> user, <span class="keyword">or</span> turned off <span class="keyword">by</span> LAME because</span><br><span class="line"> * <span class="keyword">the</span> output <span class="keyword">is</span> <span class="keyword">not</span> a regular <span class="built_in">file</span>, this call <span class="keyword">does</span> nothing</span><br><span class="line"> * NOTE:</span><br><span class="line"> * LAME wants <span class="keyword">to</span> <span class="built_in">read</span> <span class="keyword">from</span> <span class="keyword">the</span> <span class="built_in">file</span> <span class="keyword">to</span> skip an optional ID3v2 tag, so</span><br><span class="line"> * make sure you opened <span class="keyword">the</span> <span class="built_in">file</span> <span class="keyword">for</span> writing <span class="keyword">and</span> reading.</span><br><span class="line"> * NOTE:</span><br><span class="line"> * You can call lame_get_lametag_frame instead, <span class="keyword">if</span> you want <span class="keyword">to</span> insert</span><br><span class="line"> * <span class="keyword">the</span> lametag yourself.</span><br><span class="line">*/</span><br><span class="line">void CDECL lame_mp3_tags_fid(lame_global_flags *, FILE* fid);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>原来这个函数是应该在lame_encode_flush()之后调, 当所有数据都写入完毕了再调用。仔细想想也很合理, 这时才能确定文件的总帧数。</li>
+</ul>
+<h3 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h3><ul>
+<li>现在的思路就比较清晰了, 由于在Lame编码的过程中, 我们没有对VBR头进行写入, 导致了 AVPlayer duration 以每帧相同的方式来计算出现的错误.</li>
+<li>解决方法是, 在lame文件全部写入之后, lame释放之前, 使用 <code>lame_mp3_tags_fid</code> 写入 VBR 头文件, 测试通过, 读取时间正常.</li>
+<li>而这行代码 <code>lame_mp3_tags_fid</code> 我在 网上搜索的各种配置中发现都没有写.</li>
+</ul>
+<h2 id="边录制边转码的实现"><a href="#边录制边转码的实现" class="headerlink" title="边录制边转码的实现"></a>边录制边转码的实现</h2><blockquote>
+<p>通常我们是在录制结束之后, 再进行转码; 当录制的时间较长, 会消耗的时间比较长. 用户需要等待转码结束后,才能操作; 但是如果我们使用边录制,边转码的方式, 开另外一个线程同时进行转码,则几乎没有等待的时间,效率上会比较的高.</p>
+</blockquote>
+<ul>
+<li>核心代码实现</li>
+</ul>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    curpos = ftell(pcm);</span><br><span class="line">    <span class="keyword">long</span> startPos = ftell(pcm);</span><br><span class="line">    fseek(pcm, <span class="number">0</span>, SEEK_END);</span><br><span class="line">    <span class="keyword">long</span> endPos = ftell(pcm);</span><br><span class="line">    <span class="keyword">long</span> length = endPos - startPos;</span><br><span class="line">    fseek(pcm, curpos, SEEK_SET);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (length &gt; PCM_SIZE * <span class="number">2</span> * <span class="keyword">sizeof</span>(<span class="keyword">short</span> <span class="keyword">int</span>)) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!isSkipPCMHeader) &#123;</span><br><span class="line">            <span class="comment">//Uump audio file header, If you do not skip file header</span></span><br><span class="line">            <span class="comment">//you will heard some noise at the beginning!!!</span></span><br><span class="line">            fseek(pcm, <span class="number">4</span> * <span class="number">1024</span>, SEEK_CUR);</span><br><span class="line">            isSkipPCMHeader = <span class="literal">YES</span>;</span><br><span class="line">            <span class="built_in">NSLog</span>(<span class="string">@"skip pcm file header !!!!!!!!!!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        read = (<span class="keyword">int</span>)fread(pcm_buffer, <span class="number">2</span> * <span class="keyword">sizeof</span>(<span class="keyword">short</span> <span class="keyword">int</span>), PCM_SIZE, pcm);</span><br><span class="line">        write = lame_encode_buffer_interleaved(lame, pcm_buffer, read, mp3_buffer, <span class="built_in">MP3_SIZE</span>);</span><br><span class="line">        fwrite(mp3_buffer, write, <span class="number">1</span>, mp3);</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"read %d bytes"</span>, write);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        [<span class="built_in">NSThread</span> sleepForTimeInterval:<span class="number">0.05</span>];</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"sleep"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125; <span class="keyword">while</span> (! weakself.stopRecord);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>边录边转码, 只是我们在录制结果后,重新开一个线程来进行文件的转码, </li>
+<li>当录音进行中时, 会持续读取到指定大小文件,进行编码, 读取不到,则线程休眠</li>
+<li>在 while 的条件中, 我们收到 录音结束的条件,则会结束 do while 的循环.</li>
+<li>我们需要在录制结束后发送一个信号, 让 do while 跳出循环</li>
+</ul>
+<h2 id="测试-Demo"><a href="#测试-Demo" class="headerlink" title="测试 Demo"></a>测试 Demo</h2><blockquote>
+<p>为了让遇到相同问题的人, 能够更加对这些问题有一点的了解, 我会 在这里贴一个我测试的Demo 这只是一个实例程序, 并不具备完整的逻辑功能, 请熟知.</p>
+</blockquote>
+<ul>
+<li>关于Demo, 可以在 ViewController 中 <code>#define ENCODE_MP3 1</code> 使用 1 和 0 , 来测试普通转码 和 边录制 边转码.</li>
+<li><code>ConvertAudioFile</code> 是录音转码封装的源码 </li>
+<li>边录边转的用法 </li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        <span class="string">[[ConvertAudioFile</span> <span class="string">sharedInstance]</span> <span class="attr">conventToMp3WithCafFilePath:self.cafPath</span></span><br><span class="line"><span class="attr">                                                           mp3FilePath:</span><span class="string">self.mp3Path</span></span><br><span class="line"><span class="attr">                                                            sampleRate:</span><span class="string">ETRECORD_RATE</span> <span class="attr">callback:^(BOOL</span> <span class="string">result)</span></span><br><span class="line">        <span class="string">&#123;</span></span><br><span class="line">            <span class="string">NSLog(@"----</span> <span class="string">转码完成</span>  <span class="meta">---</span> <span class="string">result</span> <span class="string">%d</span>  <span class="bullet">----</span> <span class="string">", result);</span></span><br><span class="line"><span class="string">        &#125;];;</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">``` </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">- 录制完成转码的用法</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>[ConvertAudioFile conventToMp3WithCafFilePath:self.cafPath
+                  mp3FilePath:self.mp3Path
+                   sampleRate:ETRECORD_RATE callback:^(BOOL result)
+ {
+     NSLog(@&quot;---- 转码完成  --- result %d  ---- &quot;, result);
+ }];</code></pre><pre><code>
+- Demo 见 文章底部, 如果Demo 有什么不理解 和 不准确的地方,还麻烦指正...
+
+## 结语
+
+&gt; 由于时间有限, 我并不会 写太多细致的内容, 只是对这几天的研究做一个总结,和列举一些注意事项,如果在做音频录制转码中遇到相同的问题,则会有比较大的帮助.
+
+### 总结
+
+这次解决这个问题,让我受益匪浅, 很多地方的收获是超过问题本身的:
+
+* 在使用别人的示范代码时,如果不进行一定的剖析;当出现问题的时间,会比较的难判断问题的来源
+* iOS的相关技术博客,现在网上可以搜到很多相关示范代码, 但是由于很多人可能也是贴出了并不是很准确的东西, 相关给别人带来了错误的示范.
+* 作为 iOS 开发者, 对很多东西,如果想要有更加深层次的理解,则需要 1. 计算机基础扎实 2. iOS底层理解够深 3.架构设计模式理解够深 4.代码平时写的必须够优雅 
+* Google 会比 Baidu 靠谱呀; 虽然我之前也是这么想的,但这次对我有帮助的文章均来自 Google, 相反Baidu 给了很多错误的示范.
+
+### Link
+
+* [Demo - GitHub](https://github.com/CivelXu/iOS-Lame-Audio-transcoding.git)
+* [简书](http://www.jianshu.com/p/971fff236881)
+* [个人博客](http://civelxu.com/2016/07/04/iOS%20使用%20Lame%20转码%20MP3%20的最正确姿势/)
+
+### 致谢
+
+&gt; 对我有帮助的文章
+
+* https://itony.me/365.html
+* http://www.jianshu.com/p/57f38f075ba0
+</code></pre>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Lame/" rel="tag"># Lame</a>
+          
+            <a href="/tags/AVAudioRecorder/" rel="tag"># AVAudioRecorder</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/31/AlertViewController 的快速调用，看我就够了/" rel="next" title="AlertViewController 的快速调用，看我就够了。">
+                <i class="fa fa-chevron-left"></i> AlertViewController 的快速调用，看我就够了。
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/28/AsyncDisplayKit 初窥/" rel="prev" title="AsyncDisplayKit 初窥">
+                AsyncDisplayKit 初窥 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xuxiwen</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AVAudioRecorder-配置-和-Lame-编码压缩配置"><span class="nav-number">3.</span> <span class="nav-text">AVAudioRecorder 配置 和 Lame 编码压缩配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AVAudioRecorder-配置的注意事项"><span class="nav-number">3.1.</span> <span class="nav-text">AVAudioRecorder 配置的注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lame-编码压缩-的相关配置"><span class="nav-number">3.2.</span> <span class="nav-text">Lame 编码压缩 的相关配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决录音时长读取不正确的问题"><span class="nav-number">4.</span> <span class="nav-text">解决录音时长读取不正确的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题猜测"><span class="nav-number">4.1.</span> <span class="nav-text">问题猜测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#了解MP3编码格式"><span class="nav-number">4.2.</span> <span class="nav-text">了解MP3编码格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lame-源码分析"><span class="nav-number">4.3.</span> <span class="nav-text">Lame 源码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题解决"><span class="nav-number">4.4.</span> <span class="nav-text">问题解决</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边录制边转码的实现"><span class="nav-number">5.</span> <span class="nav-text">边录制边转码的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试-Demo"><span class="nav-number">6.</span> <span class="nav-text">测试 Demo</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xuxiwen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

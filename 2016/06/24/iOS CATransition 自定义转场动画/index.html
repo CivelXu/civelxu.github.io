@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="##CATransition  CATransition 是CAAnimation的子类（如下图所示），用于控制器和控制器之间的转场动画。能够来自定义系统的push和present。实现页面间的动画效果。   ####转场动画就是从一个场景以动画的形式过渡到另一个场景。转场动画的使用一般分为以下几个步骤：  创建转场动画 设置转场类型、子类型（可选）及其他属性画 设置转场后的新视图并添加动画到图层">
+<meta name="keywords" content="CATransition">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CATransition 自定义转场动画">
+<meta property="og:url" content="http://civelxu.com/2016/06/24/iOS CATransition 自定义转场动画/index.html">
+<meta property="og:site_name" content="CivelXu&#39;s Blog">
+<meta property="og:description" content="##CATransition  CATransition 是CAAnimation的子类（如下图所示），用于控制器和控制器之间的转场动画。能够来自定义系统的push和present。实现页面间的动画效果。   ####转场动画就是从一个场景以动画的形式过渡到另一个场景。转场动画的使用一般分为以下几个步骤：  创建转场动画 设置转场类型、子类型（可选）及其他属性画 设置转场后的新视图并添加动画到图层">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-c6b948be1080a8e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-532680cfbcdba668.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-a762798da4927621.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-3fdc80e55b4233c8.gif?imageMogr2/auto-orient/strip">
+<meta property="og:updated_time" content="2019-05-17T05:47:52.441Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CATransition 自定义转场动画">
+<meta name="twitter:description" content="##CATransition  CATransition 是CAAnimation的子类（如下图所示），用于控制器和控制器之间的转场动画。能够来自定义系统的push和present。实现页面间的动画效果。   ####转场动画就是从一个场景以动画的形式过渡到另一个场景。转场动画的使用一般分为以下几个步骤：  创建转场动画 设置转场类型、子类型（可选）及其他属性画 设置转场后的新视图并添加动画到图层">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1805099-c6b948be1080a8e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://civelxu.com/2016/06/24/iOS CATransition 自定义转场动画/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>CATransition 自定义转场动画 | CivelXu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CivelXu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://civelxu.com/2016/06/24/iOS CATransition 自定义转场动画/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xuxiwen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CivelXu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CATransition 自定义转场动画
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-06-24 18:24:35" itemprop="dateCreated datePublished" datetime="2016-06-24T18:24:35+08:00">2016-06-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-17 13:47:52" itemprop="dateModified" datetime="2019-05-17T13:47:52+08:00">2019-05-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Animation/" itemprop="url" rel="index"><span itemprop="name">Animation</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>##CATransition</p>
+<blockquote>
+<p>CATransition 是CAAnimation的子类（如下图所示），用于控制器和控制器之间的转场动画。能够来自定义系统的push和present。实现页面间的动画效果。</p>
+</blockquote>
+<p><img src="http://upload-images.jianshu.io/upload_images/1805099-c6b948be1080a8e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="CAAnimation 关系图"></p>
+<p>####转场动画就是从一个场景以动画的形式过渡到另一个场景。转场动画的使用一般分为以下几个步骤：</p>
+<ul>
+<li>创建转场动画</li>
+<li>设置转场类型、子类型（可选）及其他属性画</li>
+<li>设置转场后的新视图并添加动画到图层</li>
+</ul>
+<p>ios的画面切换的动画效果的API主要通过调用系统已定义的动画效果实现，这些效果已基本囊括开发的需求，如果需要更加复杂的效果，可以考虑CATransition来实现。</p>
+<a id="more"></a>
+
+<p>以下是基本的四种效果</p>
+<p>kCATransitionPush 推入效果<br>kCATransitionMoveIn 移入效果<br>kCATransitionReveal 截开效果<br>kCATransitionFade 渐入渐出效果</p>
+<p>以下API效果可以安全使用<br>cube 方块<br>suckEffect 三角<br>rippleEffect 水波抖动<br>pageCurl 上翻页<br>pageUnCurl 下翻页<br>oglFlip 上下翻转<br>cameraIrisHollowOpen 镜头快门开<br>cameraIrisHollowClose 镜头快门开</p>
+<p>以下API效果请慎用</p>
+<p>spewEffect 新版面在屏幕下方中间位置被释放出来覆盖旧版面.<br>genieEffect 旧版面在屏幕左下方或右下方被吸走, 显示出下面的新版面<br>unGenieEffect 新版面在屏幕左下方或右下方被释放出来覆盖旧版面.<br>twist 版面以水平方向像龙卷风式转出来.<br>tubey 版面垂直附有弹性的转出来.<br>swirl 旧版面360度旋转并淡出, 显示出新版面.<br>charminUltra 旧版面淡出并显示新版面.<br>zoomyIn 新版面由小放大走到前面, 旧版面放大由前面消失.<br>zoomyOut 新版面屏幕外面缩放出现, 旧版面缩小消失.<br>oglApplicationSuspend 像按”home” 按钮的效果.</p>
+<p>// 使用场景 1</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">1.</span>初始化</span><br><span class="line"><span class="built_in">CATransition</span>  *transition = [<span class="built_in">CATransition</span> animation];</span><br><span class="line"><span class="number">2.</span>设置动画时长,设置代理人</span><br><span class="line">transition.duration = <span class="number">1.0</span>f;</span><br><span class="line">transition.delegate = <span class="keyword">self</span>;</span><br><span class="line"><span class="number">3.</span>设置切换速度效果</span><br><span class="line">transition.timingFunction = [<span class="built_in">CAMediaTimingFunction</span> functionWithName:kCAMediaTimingFunctionEaseInEaseOut];</span><br><span class="line">枚举值:</span><br><span class="line">kCAMediaTimingFunctionLinear</span><br><span class="line">kCAMediaTimingFunctionEaseIn</span><br><span class="line">kCAMediaTimingFunctionEaseOut</span><br><span class="line">kCAMediaTimingFunctionEaseInEaseOut</span><br><span class="line">kCAMediaTimingFunctionDefault</span><br><span class="line"><span class="number">4.</span>动画切换风格</span><br><span class="line">transition.type = kCATransitionFade;</span><br><span class="line">枚举值:</span><br><span class="line">kCATransitionFade = <span class="number">1</span>,     <span class="comment">// 淡入淡出</span></span><br><span class="line">kCATransitionPush,         <span class="comment">// 推进效果</span></span><br><span class="line">kCATransitionReveal,       <span class="comment">// 揭开效果     </span></span><br><span class="line">kCATransitionMoveIn,       <span class="comment">// 慢慢进入并覆盖效果</span></span><br><span class="line"><span class="number">5.</span>动画切换方向</span><br><span class="line">transition.subtype = kCATransitionFromTop;<span class="comment">//顶部</span></span><br><span class="line">枚举值:</span><br><span class="line">kCATransitionFromRight<span class="comment">//右侧</span></span><br><span class="line">kCATransitionFromLeft<span class="comment">//左侧</span></span><br><span class="line">kCATransitionFromTop<span class="comment">//顶部</span></span><br><span class="line">kCATransitionFromBottom<span class="comment">//底部</span></span><br><span class="line"><span class="number">6.</span>进行跳转</span><br><span class="line">[<span class="keyword">self</span>.navigationController.view.layer addAnimation:transition forKey:<span class="literal">nil</span>];</span><br><span class="line">[<span class="keyword">self</span>.navigationController pushViewController:<span class="string">"你要跳转的页面"</span> animated:<span class="literal">NO</span>];</span><br><span class="line">跳转动画一定设置为<span class="literal">NO</span>,不然会两个效果叠加</span><br></pre></td></tr></table></figure>
+
+<p>// 使用场景2</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="keyword">void</span>)transitionWithView:(<span class="built_in">UIView</span> *)view duration:(<span class="built_in">NSTimeInterval</span>)duration options:(<span class="built_in">UIViewAnimationOptions</span>)options animations:(<span class="keyword">void</span> (^ __<span class="keyword">nullable</span>)(<span class="keyword">void</span>))animations completion:(<span class="keyword">void</span> (^ __<span class="keyword">nullable</span>)(<span class="built_in">BOOL</span> finished))completion <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">4</span>_0);</span><br><span class="line"></span><br><span class="line">+ (<span class="keyword">void</span>)transitionFromView:(<span class="built_in">UIView</span> *)fromView toView:(<span class="built_in">UIView</span> *)toView duration:(<span class="built_in">NSTimeInterval</span>)duration options:(<span class="built_in">UIViewAnimationOptions</span>)options completion:(<span class="keyword">void</span> (^ __<span class="keyword">nullable</span>)(<span class="built_in">BOOL</span> finished))completion <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">4</span>_0); <span class="comment">// toView added to fromView.superview, fromView removed from its superview</span></span><br></pre></td></tr></table></figure>
+
+<p><a href="https://github.com/CivelXu/CATransition-Basic.git" target="_blank" rel="noopener">CATransition-Basic -代码传送门</a></p>
+<blockquote>
+<p>下面通过自定义push 和 present 两个demo来分析下转场动画的实现原理：</p>
+</blockquote>
+<h3 id="自定义-Push"><a href="#自定义-Push" class="headerlink" title="自定义 Push"></a>自定义 Push</h3><p><img src="http://upload-images.jianshu.io/upload_images/1805099-532680cfbcdba668.gif?imageMogr2/auto-orient/strip" alt="效果图"></p>
+<p> 首先要完场自定义Push 我们需要创建一个转场动画对象，继承于NSObject （导入&lt;UIKit/UIKit.h&gt;框架）并遵守UIViewControllerAnimatedTransitioning协议， 这里叫做MagicMoveTransition。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;Foundation/Foundation.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MagicMoveTransition</span> : <span class="title">NSObject</span>&lt;<span class="title">UIViewControllerAnimatedTransitioning</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p>我们需要实现UIViewControllerAnimatedTransitioning协议里面的代理方法来实现转场动画效果。</p>
+<ul>
+<li><p>该方法返回动画执行时间</p>
+<figure class="highlight plain"><figcaption><span>(NSTimeInterval)transitionDuration:(id<uiviewcontrollercontexttransitioning>)transitionContext；</uiviewcontrollercontexttransitioning></span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">```</span><br><span class="line"></span><br><span class="line">* 该方法用来实现两个VC间的动画布局</span><br><span class="line">```- (void)animateTransition:(id&lt;UIViewControllerContextTransitioning&gt;)transitionContext</span><br></pre></td></tr></table></figure>
+
+<p>transitionContext 该参数 可以让我们去访问一些实现对象所必须的对象</p>
+</li>
+</ul>
+<p>  <img src="http://upload-images.jianshu.io/upload_images/1805099-a762798da4927621.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="UIViewControllerContextTransitioning"></p>
+<blockquote>
+<p>扩展 UIViewControllerContextTransitioning</p>
+</blockquote>
+ <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>  - （<span class="built_in">UIView</span> *）containerView;</span><br><span class="line">   <span class="comment">// 转场动画的容器 -&gt; 添加两个控制器 视图内容 （注意添加的前后顺序）</span></span><br><span class="line">   </span><br><span class="line"><span class="number">2.</span>  - (<span class="built_in">UIViewController</span> *)viewControllerForKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line">   <span class="comment">// 通过该方法， Key值 拿到过渡的两个VC</span></span><br><span class="line">   </span><br><span class="line"><span class="number">3.</span>  - (<span class="built_in">CGRect</span>)initialFrameForViewController:(<span class="built_in">UIViewController</span> *)vc;</span><br><span class="line">    - (<span class="built_in">CGRect</span>)finalFrameForViewController:(<span class="built_in">UIViewController</span> *)vc;</span><br><span class="line">   <span class="comment">// 通过这个方法 能够获得前后两个 ViewController 的frame，用来布局视图对象空间位置</span></span><br></pre></td></tr></table></figure>
+
+<p>现在我们可以通过 transitionContext开始做转场动画</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 起始VC</span></span><br><span class="line">ViewController *fromVC = [transitionContext viewControllerForKey:<span class="built_in">UITransitionContextFromViewControllerKey</span>];</span><br><span class="line"><span class="comment">// 目的VC</span></span><br><span class="line">DeatailViewController *toVC = [transitionContext viewControllerForKey:<span class="built_in">UITransitionContextToViewControllerKey</span>];</span><br><span class="line"><span class="comment">// 转场视图容器</span></span><br><span class="line"><span class="built_in">UIView</span> *containerView = [transitionContext containerView];</span><br></pre></td></tr></table></figure>
+
+<p> 然后我们需要获取CollectionViewCell 上面的视图ImageView 进行做动画</p>
+<blockquote>
+<p>扩展  iOS  , UIView 中坐标的转换</p>
+</blockquote>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-</span> (CGPoint)<span class="selector-tag">convertPoint</span><span class="selector-pseudo">:(CGPoint)point</span> <span class="selector-tag">toView</span><span class="selector-pseudo">:(UIView</span> *)<span class="selector-tag">view</span>;</span><br><span class="line">   <span class="comment">// 将像素Point 由Point所在控制器转换到目标控制器视图View中， 返回在目标视图中的像素值。</span></span><br><span class="line"></span><br><span class="line"><span class="selector-tag">-</span> (CGPoint)<span class="selector-tag">convertPoint</span><span class="selector-pseudo">:(CGPoint)point</span> <span class="selector-tag">fromView</span><span class="selector-pseudo">:(UIView</span> *)<span class="selector-tag">view</span>;</span><br><span class="line">   <span class="comment">// 由上面一条相反，获取目标View的像素Point返回到当前控制器View中</span></span><br><span class="line">   </span><br><span class="line"><span class="selector-tag">-</span> (CGRect)<span class="selector-tag">convertRect</span><span class="selector-pseudo">:(CGRect)rect</span> <span class="selector-tag">toView</span><span class="selector-pseudo">:(UIView</span> *)<span class="selector-tag">view</span>;</span><br><span class="line">   <span class="comment">// 将坐标frame的rect值，由当前所在的目标视图View中， 返回在当前视图中的rect</span></span><br><span class="line">   </span><br><span class="line"><span class="selector-tag">-</span> (CGRect)<span class="selector-tag">convertRect</span><span class="selector-pseudo">:(CGRect)rect</span> <span class="selector-tag">fromView</span><span class="selector-pseudo">:(UIView</span> *)<span class="selector-tag">view</span>;</span><br><span class="line">   <span class="comment">// 将坐标frame的rect值，由当前所在的目标视图View中， 返回在当前视图中的rect</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在这里通过获取我们点击的Cell，获取上面的ImageView</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (nullable NSArray&lt;NSIndexPath *&gt; *)indexPathsForSelectedItems; // returns nil<span class="built_in"> or </span>an<span class="built_in"> array </span>of selected index paths</span><br><span class="line"></span><br><span class="line">- (nullable UICollectionViewCell *)cellForItemAtIndexPath:(NSIndexPath *)indexPath;</span><br></pre></td></tr></table></figure>
+
+<p>具体代码如下</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSIndexPath</span> *indexPath = [[fromVC.collectionView indexPathsForSelectedItems] firstObject];</span><br><span class="line">fromVC.indexPath = indexPath; <span class="comment">// 记录indexPath 返回时使用</span></span><br><span class="line">CustomCollectionViewCell *cell = (CustomCollectionViewCell *)[fromVC.collectionView cellForItemAtIndexPath:indexPath];</span><br><span class="line"><span class="comment">// 对Cell上面的图片 做截图 来实现过渡动画视图</span></span><br><span class="line"><span class="built_in">UIView</span> *screenShot = [cell.pic snapshotViewAfterScreenUpdates:<span class="literal">NO</span>];</span><br><span class="line">screenShot.backgroundColor = [<span class="built_in">UIColor</span> clearColor];</span><br><span class="line">screenShot.frame = fromVC.finiRect = [containerView convertRect:cell.pic.frame fromView:cell.pic.superview];</span><br><span class="line"><span class="comment">// fromVC.finiRect 返回时获取cell上的坐标</span></span><br><span class="line">cell.pic.hidden = <span class="literal">YES</span>;</span><br><span class="line"><span class="comment">// 在进入下一个界面时，隐藏当前Cell上面的imageView</span></span><br></pre></td></tr></table></figure>
+
+<p>然后我们 来 设置第二个控制器的位置和透明度</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">toVC.<span class="keyword">view</span>.frame = [transitionContext finalFrameForViewController:toVC];</span><br><span class="line">toVC.<span class="keyword">view</span>.<span class="keyword">alpha</span> = 0.5;</span><br><span class="line">toVC.secondPic.hidden = YES;</span><br><span class="line"><span class="comment">// 把动画前后的两个ViewController加到容器控制器中</span></span><br><span class="line">[containerView addSubview:toVC.<span class="keyword">view</span>];</span><br><span class="line">[containerView addSubview:screenShot];</span><br><span class="line">    <span class="comment">// 注意添加顺序</span></span><br></pre></td></tr></table></figure>
+
+<p>现在开始做动画，可以根据你的项目需求来获取，控制器内的控件，来完成彼此间的动画交互。</p>
+<ul>
+<li>这里 :[self transitionDuration:transitionContext]会返回转场动画所进行时间。</li>
+<li>执行该语句来告诉系统转场动画结束， 这里使用!transitionContext.transitionWasCancelled，是为了后面做手势交互，避免手势取消时，造成卡顿现象。<br>[transitionContext completeTransition:!transitionContext.transitionWasCancelled];<br>}];<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[UIView <span class="string">animateWithDuration:</span>[self <span class="string">transitionDuration:</span>transitionContext] <span class="string">animations:</span>^&#123;</span><br><span class="line">        <span class="comment">// 调用自动布局</span></span><br><span class="line">        [containerView layoutIfNeeded];</span><br><span class="line">        fromVC.view.alpha = <span class="number">1.0</span>;</span><br><span class="line">        <span class="comment">// 布局坐标</span></span><br><span class="line">       <span class="comment">// 获取到下一个VC中的secondPic.frame,使Cell上面的截图，移动到第二VC视图中， 动画结束后， 移除该截图。视觉上会产生一种过渡效果。</span></span><br><span class="line">        screenShot.frame = [containerView <span class="string">convertRect:</span>toVC.secondPic.frame <span class="string">toView:</span>toVC.secondPic.superview];</span><br><span class="line">    &#125; <span class="string">completion:</span>^(BOOL finished) &#123;</span><br><span class="line">        toVC.secondPic.hidden = NO;</span><br><span class="line">        cell.pic.hidden = NO;</span><br><span class="line">        <span class="comment">// 动画截图移除View</span></span><br><span class="line">        [screenShot removeFromSuperview];</span><br><span class="line">        toVC.view.alpha = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 动画结束</span></span><br><span class="line">        <span class="comment">// 一定不要忘记告诉系统动画结束</span></span><br><span class="line">        <span class="comment">// 执行</span></span><br><span class="line">        [transitionContext <span class="string">completeTransition:</span>!transitionContext.transitionWasCancelled];</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>现在我们就可以来实现来使用自定义的转场动画对象</p>
+<blockquote>
+<p>  这里的转场动画属于自定义push， 由导航栏来控制，属于导航控制器来负责转场。我们让当前控制器来作为 UINavigationControllerDelegate代理对象， 并实现协议方法。</p>
+</blockquote>
+<p> 在视图已经出现的时候来指定代理对象为自身</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidAppear:(<span class="built_in">BOOL</span>)animated</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidAppear:animated];</span><br><span class="line">    <span class="keyword">self</span>.navigationController.delegate = <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#pragma mark - 返回我们写好的转场对象</span></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="keyword">id</span> &lt;<span class="built_in">UIViewControllerAnimatedTransitioning</span>&gt;)navigationController:(<span class="built_in">UINavigationController</span> *)navigationController</span><br><span class="line">                                            animationControllerForOperation:(<span class="built_in">UINavigationControllerOperation</span>)operation</span><br><span class="line">                                                         fromViewController:(<span class="built_in">UIViewController</span> *)fromVC</span><br><span class="line">                                                           toViewController:(<span class="built_in">UIViewController</span> *)toVC</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ([toVC isKindOfClass:[DeatailViewController <span class="keyword">class</span>]]) &#123;</span><br><span class="line">        MagicMoveTransition *transition = [[MagicMoveTransition alloc] init];</span><br><span class="line">        <span class="keyword">return</span> transition;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到这里我们push转场动画就已经实现了， pop回来的动画我们可以类比push来实现。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">"MagicMoveBackTransition.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"ViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"DeatailViewController.h"</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"CustomCollectionViewCell.h"</span></span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MagicMoveBackTransition</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark - 返回动画时间</span></span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSTimeInterval</span>)transitionDuration:(<span class="keyword">id</span>&lt;<span class="built_in">UIViewControllerContextTransitioning</span>&gt;)transitionContext</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.6</span>f;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#pragma mark - 两个VC过渡动画</span></span><br><span class="line">- (<span class="keyword">void</span>)animateTransition:(<span class="keyword">id</span>&lt;<span class="built_in">UIViewControllerContextTransitioning</span>&gt;)transitionContext</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 目的VC</span></span><br><span class="line">    ViewController *toVC = [transitionContext viewControllerForKey:<span class="built_in">UITransitionContextToViewControllerKey</span>];</span><br><span class="line">    <span class="comment">// 起始VC</span></span><br><span class="line">    DeatailViewController *fromVC = [transitionContext viewControllerForKey:<span class="built_in">UITransitionContextFromViewControllerKey</span>];</span><br><span class="line">    <span class="comment">// 转场视图容器</span></span><br><span class="line">    <span class="built_in">UIView</span> *containerView = [transitionContext containerView];</span><br><span class="line">      <span class="built_in">UIView</span> *screenShot = [fromVC.secondPic snapshotViewAfterScreenUpdates:<span class="literal">NO</span>];</span><br><span class="line">    screenShot.backgroundColor = [<span class="built_in">UIColor</span> clearColor];</span><br><span class="line">    screenShot.frame = [containerView convertRect:fromVC.secondPic.frame fromView:fromVC.secondPic.superview];</span><br><span class="line">    fromVC.secondPic.hidden = <span class="literal">YES</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 初始化第二个Vc</span></span><br><span class="line">    toVC.view.frame = [transitionContext finalFrameForViewController:toVC];</span><br><span class="line">    </span><br><span class="line">    CustomCollectionViewCell *cell = (CustomCollectionViewCell *)[toVC.collectionView cellForItemAtIndexPath:toVC.indexPath];</span><br><span class="line">    cell.pic.hidden = <span class="literal">YES</span>;</span><br><span class="line">    [containerView insertSubview:toVC.view belowSubview:fromVC.view];</span><br><span class="line">    [containerView addSubview:screenShot];</span><br><span class="line">    <span class="comment">// 发生动画</span></span><br><span class="line">    [<span class="built_in">UIView</span> animateWithDuration:[<span class="keyword">self</span> transitionDuration:transitionContext] animations:^&#123;</span><br><span class="line">        </span><br><span class="line">        fromVC.view.alpha = <span class="number">0</span>;</span><br><span class="line">        screenShot.frame = toVC.finiRect;</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">    &#125; completion:^(<span class="built_in">BOOL</span> finished) &#123;</span><br><span class="line">        </span><br><span class="line">        [screenShot removeFromSuperview];</span><br><span class="line">        fromVC.secondPic.hidden = <span class="literal">NO</span>;</span><br><span class="line">        cell.pic.hidden = <span class="literal">NO</span>;</span><br><span class="line">        fromVC.view.alpha = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 结束</span></span><br><span class="line">        [transitionContext completeTransition:!transitionContext.transitionWasCancelled];</span><br><span class="line">    &#125;];</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+
+<p> 另外我们可以通过添加手势,来能实现系统手势驱动;UIPercentDrivenInteractiveTransition 能够帮助我们完成视图切换的过度动画</p>
+<p>在 DeatailViewController pop回来时添加屏幕边缘手势</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 添加屏幕边缘手势</span></span><br><span class="line"><span class="built_in">UIScreenEdgePanGestureRecognizer</span> *edgePagGesture = [[<span class="built_in">UIScreenEdgePanGestureRecognizer</span> alloc] initWithTarget:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(edgeAction:)];</span><br><span class="line">edgePagGesture.edges = <span class="built_in">UIRectEdgeLeft</span>; <span class="comment">// 设置什么便捷滑入</span></span><br><span class="line">[<span class="keyword">self</span>.view addGestureRecognizer:edgePagGesture];</span><br></pre></td></tr></table></figure>
+
+<p>// 实现手势方法</p>
+<p> iOS7 新加入一个类对象 UIPercentDrivenInteractiveTransition ;这个对象会根据我们的手势，来决定我们界面跳转的自定义过渡效果，我们在手势action方法中，对手势驱动状态进行判断，来决定是否过渡动画。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)edgeAction:(<span class="built_in">UIScreenEdgePanGestureRecognizer</span> *)sender</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 计算手指滑动的距离</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 计算手势驱动占屏幕的百分比</span></span><br><span class="line">    <span class="built_in">CGFloat</span> distance = [sender translationInView:sender.view].x / <span class="keyword">self</span>.view.bounds.size.width;</span><br><span class="line">    distance = MIN(<span class="number">1.0</span>, MAX(<span class="number">0.0</span>, distance));</span><br><span class="line">    <span class="comment">// 限制百分比 0 - 1 之间</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (sender.state == <span class="built_in">UIGestureRecognizerStateBegan</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.percentDrivenTransition = [[<span class="built_in">UIPercentDrivenInteractiveTransition</span> alloc] init];</span><br><span class="line">        [<span class="keyword">self</span>.navigationController popViewControllerAnimated:<span class="literal">YES</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (sender.state == <span class="built_in">UIGestureRecognizerStateChanged</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 手势在慢慢划入 // 把手势的进度告诉 UIPercentDrivenInteractiveTransition</span></span><br><span class="line">        [<span class="keyword">self</span>.percentDrivenTransition updateInteractiveTransition:distance];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (sender.state == <span class="built_in">UIGestureRecognizerStateEnded</span> || sender.state == <span class="built_in">UIGestureRecognizerStateCancelled</span>)</span><br><span class="line">    &#123;</span><br><span class="line"><span class="comment">// 判断当手势到达一定范围内 </span></span><br><span class="line">        <span class="keyword">if</span> (distance &gt; <span class="number">0.5</span>) &#123;</span><br><span class="line">            [<span class="keyword">self</span>.percentDrivenTransition finishInteractiveTransition];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            [<span class="keyword">self</span>.percentDrivenTransition cancelInteractiveTransition];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">self</span>.percentDrivenTransition = <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行手势驱动代理方法</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">id</span>&lt;<span class="built_in">UIViewControllerInteractiveTransitioning</span>&gt;)navigationController:(<span class="built_in">UINavigationController</span> *)navigationController interactionControllerForAnimationController:(<span class="keyword">id</span>&lt;<span class="built_in">UIViewControllerAnimatedTransitioning</span>&gt;)animationController</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ([animationController isKindOfClass:[MagicMoveBackTransition <span class="keyword">class</span>]]) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">self</span>.percentDrivenTransition;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到这里我们就完成了自定义push<br><a href="https://github.com/CivelXu/CATransition-Push.git" target="_blank" rel="noopener">代码传送门</a></p>
+<h3 id="自定义-Present"><a href="#自定义-Present" class="headerlink" title="自定义 Present"></a>自定义 Present</h3><p><img src="http://upload-images.jianshu.io/upload_images/1805099-3fdc80e55b4233c8.gif?imageMogr2/auto-orient/strip" alt="效果图"></p>
+<ul>
+<li>自定义present和自定push相似,自定义present负责转场的是导航控制器,自定present负责的转场的是视图控制器本身.</li>
+<li>视图处理的逻辑一样 ;分别实现基于 UIViewControllerAnimatedTransitioning的present 和dismiss 详细参考自定义push,下面讲下区别的地方.</li>
+</ul>
+<p>// 在第一个present 推出的视图那里,我们需要让该控制器遵守 <uiviewcontrollertransitioningdelegate></uiviewcontrollertransitioningdelegate></p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidAppear:(<span class="built_in">BOOL</span>)animated</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidAppear:animated];</span><br><span class="line">    <span class="keyword">self</span>.transitioningDelegate = <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是目标VC也需要遵守该协议;这里以prepareForSegue为例</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)<span class="string">prepareForSegue:</span>(UIStoryboardSegue *)segue <span class="string">sender:</span>(id)sender</span><br><span class="line">&#123;</span><br><span class="line">    SecondViewController *secondVc = (SecondViewController *)segue.destinationViewController;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 注意一定要把目标值 也作为当前 UIViewControllerTransitioningDelegate的代理人</span></span><br><span class="line">    secondVc.transitioningDelegate = self;</span><br><span class="line">    [<span class="keyword">super</span> <span class="string">prepareForSegue:</span>segue <span class="string">sender:</span>sender];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时目标VC 遵守UIViewControllerTransitioningDelegate</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidAppear:(<span class="built_in">BOOL</span>)animated</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidAppear:animated];</span><br><span class="line">    <span class="keyword">self</span>.transitioningDelegate = <span class="keyword">self</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 添加屏幕边缘手势</span></span><br><span class="line">    <span class="built_in">UIScreenEdgePanGestureRecognizer</span> *edgePagGesture = [[<span class="built_in">UIScreenEdgePanGestureRecognizer</span> alloc] initWithTarget:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(edgeAction:)];</span><br><span class="line">    edgePagGesture.edges = <span class="built_in">UIRectEdgeLeft</span>; <span class="comment">// 设置什么便捷滑入</span></span><br><span class="line">    [<span class="keyword">self</span>.view addGestureRecognizer:edgePagGesture];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>详细的代码这里就不贴出来了.<br>详情代码<br><a href="https://github.com/CivelXu/CATransition-Modal.git" target="_blank" rel="noopener">github</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CATransition/" rel="tag"># CATransition</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/28/iOS 基础知识(面试)深度理解/" rel="prev" title="iOS 基础知识(面试)深度理解">
+                iOS 基础知识(面试)深度理解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xuxiwen</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义-Push"><span class="nav-number">1.</span> <span class="nav-text">自定义 Push</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义-Present"><span class="nav-number">2.</span> <span class="nav-text">自定义 Present</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xuxiwen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

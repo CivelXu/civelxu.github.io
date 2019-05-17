@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言 Alert 在iOS开发中，是一个经常用到的控件。iOS原生的API中的写法，我这里就不吐槽了，无论是AlertView 还是AlertViewcontroller 都需要很多代码来调用。   网上有很多关于AlertView的封装，再加上这是个已经被废弃的控件。我这里就不来叙述。这里提供一个我自己实现的AlertViewController的快速调用。  看下图，我猜还有很多人，还在用着废">
+<meta name="keywords" content="AlertViewController">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AlertViewController 的快速调用，看我就够了。">
+<meta property="og:url" content="http://civelxu.com/2017/03/31/AlertViewController 的快速调用，看我就够了/index.html">
+<meta property="og:site_name" content="CivelXu&#39;s Blog">
+<meta property="og:description" content="前言 Alert 在iOS开发中，是一个经常用到的控件。iOS原生的API中的写法，我这里就不吐槽了，无论是AlertView 还是AlertViewcontroller 都需要很多代码来调用。   网上有很多关于AlertView的封装，再加上这是个已经被废弃的控件。我这里就不来叙述。这里提供一个我自己实现的AlertViewController的快速调用。  看下图，我猜还有很多人，还在用着废">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-d858de2787e595be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-5e720f1140afc68c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/500">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-15ec010bf4613fa6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-f1aec1487a215b1c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-7ba52b232ddd9f9e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1805099-06993d4ae22a29ab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375">
+<meta property="og:updated_time" content="2019-05-17T05:47:22.506Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AlertViewController 的快速调用，看我就够了。">
+<meta name="twitter:description" content="前言 Alert 在iOS开发中，是一个经常用到的控件。iOS原生的API中的写法，我这里就不吐槽了，无论是AlertView 还是AlertViewcontroller 都需要很多代码来调用。   网上有很多关于AlertView的封装，再加上这是个已经被废弃的控件。我这里就不来叙述。这里提供一个我自己实现的AlertViewController的快速调用。  看下图，我猜还有很多人，还在用着废">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1805099-d858de2787e595be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://civelxu.com/2017/03/31/AlertViewController 的快速调用，看我就够了/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>AlertViewController 的快速调用，看我就够了。 | CivelXu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CivelXu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://civelxu.com/2017/03/31/AlertViewController 的快速调用，看我就够了/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xuxiwen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CivelXu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AlertViewController 的快速调用，看我就够了。
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-03-31 19:33:06" itemprop="dateCreated datePublished" datetime="2017-03-31T19:33:06+08:00">2017-03-31</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-17 13:47:22" itemprop="dateModified" datetime="2019-05-17T13:47:22+08:00">2019-05-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/AlertViewController/" itemprop="url" rel="index"><span itemprop="name">AlertViewController</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>Alert 在iOS开发中，是一个经常用到的控件。iOS原生的API中的写法，我这里就不吐槽了，无论是AlertView 还是AlertViewcontroller 都需要很多代码来调用。</p>
+</blockquote>
+<blockquote>
+<p>网上有很多关于AlertView的封装，再加上这是个已经被废弃的控件。我这里就不来叙述。这里提供一个我自己实现的AlertViewController的快速调用。</p>
+</blockquote>
+<p>看下图，我猜还有很多人，还在用着废弃的Alert，忍受着 ⚠️⚠️⚠️<br> <img src="http://upload-images.jianshu.io/upload_images/1805099-d858de2787e595be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375" alt="警告视图"></p>
+<p>好了下面就直接上代码的使用 &gt;&gt;&gt;&gt;&gt;&gt; </p>
+<a id="more"></a>
+
+
+<h2 id="快速创建"><a href="#快速创建" class="headerlink" title="快速创建"></a>快速创建</h2><p>代码示范</p>
+<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[<span class="name">XWAlert</span> showAlertWithTitle:@<span class="string">"提示"</span></span><br><span class="line">                    message:@<span class="string">"你浏览的是成人内容，是否满足18岁？"</span></span><br><span class="line">               confirmTitle:@<span class="string">"满足"</span></span><br><span class="line">                cancelTitle:@<span class="string">"自动离开"</span></span><br><span class="line">             preferredStyle:(<span class="name">UIAlertControllerStyleActionSheet/UIAlertControllerStyleAlert</span>)</span><br><span class="line">              confirmHandle:^&#123;</span><br><span class="line">                 NSLog(<span class="name">@</span><span class="string">"满足-----"</span>)<span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line">               cancleHandle:^&#123;</span><br><span class="line">                 NSLog(<span class="name">@</span><span class="string">"不满足-----"</span>)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">&#125;]<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1805099-5e720f1140afc68c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/500" alt="效果预览"></p>
+<blockquote>
+<p>当然，你还可以省略其中任何一个</p>
+</blockquote>
+<h2 id="自定义UIAlertAction-数量种类不限"><a href="#自定义UIAlertAction-数量种类不限" class="headerlink" title="自定义UIAlertAction 数量种类不限"></a>自定义UIAlertAction 数量种类不限</h2><p>示例1</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">   [XWAlert <span class="keyword">showAlertWithTitle:@"选择题"</span></span><br><span class="line"><span class="keyword"> </span>                       message:@<span class="string">"菊花一词，为何走红？"</span></span><br><span class="line"><span class="symbol">                 preferredStyle:</span>UIAlertControllerStyleAlert</span><br><span class="line"><span class="symbol">                    actionMaker:</span>^(UIAlertController *maker) &#123;</span><br><span class="line">                        </span><br><span class="line">                        NSString *string1 = @<span class="string">"菊花台这首歌"</span><span class="comment">;</span></span><br><span class="line">                        NSString *string2 = @<span class="string">"陶渊明的诗词"</span><span class="comment">;</span></span><br><span class="line">                        NSString *string3 = @<span class="string">"象征纯洁"</span><span class="comment">;</span></span><br><span class="line">                        NSString *string4 = @<span class="string">"人体器官的形象话"</span><span class="comment">;</span></span><br><span class="line">                        NSString *string5 = @<span class="string">"我选择死亡"</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line"> [maker <span class="keyword">addAlertDefaultActionWithTitle:string1 </span>handler:^(UIAlertAction * _Nullable action) &#123;</span><br><span class="line">                            NSLog(@<span class="string">"你的选择是--- %@"</span>, string1)<span class="comment">;</span></span><br><span class="line">                        &#125;]<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                        [maker <span class="keyword">addAlertDefaultActionWithTitle:string2 </span>handler:^(UIAlertAction * _Nullable action) &#123;</span><br><span class="line">                            NSLog(@<span class="string">"你的选择是--- %@"</span>, string2)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                        &#125;]<span class="comment">;</span></span><br><span class="line">         </span><br><span class="line">                        [maker <span class="keyword">addAlertDefaultActionWithTitle:string3 </span>handler:^(UIAlertAction * _Nullable action) &#123;</span><br><span class="line">                            NSLog(@<span class="string">"你的选择是--- %@"</span>, string3)<span class="comment">;</span></span><br><span class="line">                        &#125;]<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                        [maker <span class="keyword">addAlertActionWithTitle:string4 </span>actionStyle:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nullable action) &#123;</span><br><span class="line">                            NSLog(@<span class="string">"你的选择是--- %@"</span>, string4)<span class="comment">;</span></span><br><span class="line">                            </span><br><span class="line">                        &#125;]<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                        [maker <span class="keyword">addAlertActionWithTitle:string5 </span>actionStyle:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nullable action) &#123;</span><br><span class="line">                            NSLog(@<span class="string">"你的选择是--- %@"</span>, string5)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                        &#125;]<span class="comment">;</span></span><br><span class="line">    &#125;]<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1805099-15ec010bf4613fa6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375" alt="示例1"></p>
+<p>示例2</p>
+<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[<span class="name">XWAlert</span> showAlertWithTitle:@<span class="string">"注意"</span></span><br><span class="line">                     message:@<span class="string">"按照要求填写信息"</span></span><br><span class="line">              preferredStyle:self.selectedStyle</span><br><span class="line">                 actionMaker:^(<span class="name">UIAlertController</span> *maker) &#123;</span><br><span class="line">                     </span><br><span class="line">                     NSString *string1 = @<span class="string">"确定"</span><span class="comment">;</span></span><br><span class="line">                     NSString *string2 = @<span class="string">"取消"</span><span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                     [<span class="name">maker</span> addAlertDefaultActionWithTitle:string1</span><br><span class="line">                                                   handler:^(<span class="name">UIAlertAction</span> * _Nullable action) &#123;</span><br><span class="line">                         NSLog(<span class="name">@</span><span class="string">"你的选择是--- %@"</span>, string1)<span class="comment">;</span></span><br><span class="line">                     &#125;]<span class="comment">;</span></span><br><span class="line">                     </span><br><span class="line"></span><br><span class="line">                     [<span class="name">maker</span> addAlertActionWithTitle:string2</span><br><span class="line">                                        actionStyle:ActionStyleCancel</span><br><span class="line">                                            handler:^(<span class="name">UIAlertAction</span> * _Nullable action) &#123;</span><br><span class="line">                         NSLog(<span class="name">@</span><span class="string">"你的选择是--- %@"</span>, string2)<span class="comment">;</span></span><br><span class="line">                     &#125;]<span class="comment">;</span></span><br><span class="line">                     </span><br><span class="line"></span><br><span class="line">                     [<span class="name">maker</span> addTextFieldWithPlaceholder:@<span class="string">"输入用户名"</span></span><br><span class="line">                                        secureTextEntry:NO</span><br><span class="line">                                                textHandler:^(<span class="name">NSString</span> * _Nullable text) &#123;</span><br><span class="line">                        NSLog(<span class="name">@</span><span class="string">"你输入的用户是--- %@"</span>,text)<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">                     &#125;]<span class="comment">;</span></span><br><span class="line">                     </span><br><span class="line">                     [<span class="name">maker</span> addTextFieldWithPlaceholder:@<span class="string">"输入密码"</span></span><br><span class="line">                                        secureTextEntry:YES</span><br><span class="line">                                       textFiledhandler:^(<span class="name">UITextField</span> * _Nonnull textField) &#123;</span><br><span class="line">                          textField.textColor = [<span class="name">UIColor</span> greenColor]<span class="comment">;</span></span><br><span class="line">                          textField.font = [<span class="name">UIFont</span> boldSystemFontOfSize:16]<span class="comment">;</span></span><br><span class="line">                                                  &#125;]<span class="comment">;</span></span><br><span class="line">                 &#125;]<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1805099-f1aec1487a215b1c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375" alt="示例2"></p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">这里需要注意的是 这个方法 callback 一个 <span class="built_in">UIAlertController</span> ，*maker。 </span><br><span class="line">我为<span class="built_in">UIAlertController</span>添加了一个便利添加<span class="built_in">UIAlertAction</span>的Category。</span><br></pre></td></tr></table></figure>
+
+<p> 第一种是添加一个默认的AlertAction,只需要输入标题，然后handle业务逻辑就可以。</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> to add UIAlertAction with UIAlertActionStyleDefault</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> title - the title of UIAlertAction</span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> handler - to handle your business</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">void</span>)addAlertDefaultActionWithTitle:(NSString *_Nullable)title</span><br><span class="line">                               <span class="keyword">handler</span>:(<span class="keyword">void</span> (^_Nullable)(UIAlertAction * _Nullable  action))<span class="keyword">handler</span>;</span><br></pre></td></tr></table></figure>
+
+<p>  第二种和第一种的区别在于可以选择样式</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> to add UIAlertAction with Custom Style</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> title - the title of UIAlertAction</span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> actionStyle - to chose UIAlertActionStyle</span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> handler - to handle your business</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">void</span>)addAlertActionWithTitle:(NSString *_Nullable)title</span><br><span class="line">                    actionStyle:(UIAlertActionStyle)actionStyle</span><br><span class="line">                        <span class="keyword">handler</span>:(<span class="keyword">void</span> (^ __nullable)(UIAlertAction * _Nullable action))<span class="keyword">handler</span>;</span><br></pre></td></tr></table></figure>
+
+<p>第三种是添加TextFiled，可以添加占位，密文输入。会callback 一个输入结束后的text</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> <span class="keyword">to</span> add TextField <span class="keyword">in</span> your alert , callback <span class="keyword">the</span>  <span class="built_in">text</span> which  you input</span><br><span class="line"> <span class="keyword">it</span> only support <span class="keyword">in</span> Alert Styple</span><br><span class="line"></span><br><span class="line"> @param placeholder - <span class="keyword">set</span> TextField's placeholder</span><br><span class="line"> @param secureTextEntry - <span class="keyword">set</span> Secure input Mode</span><br><span class="line"> @param textHandler - <span class="keyword">to</span> <span class="keyword">get</span> <span class="built_in">text</span> which  you input</span><br><span class="line"> */</span><br><span class="line">- (void)addTextFieldWithPlaceholder:(NSString *_Nullable)placeholder</span><br><span class="line">                    secureTextEntry:(BOOL)secureTextEntry</span><br><span class="line">                            textHandler:(TextFiledHanler _Nullable )textHandler;</span><br></pre></td></tr></table></figure>
+
+<p> 第四种和第三种类似，添加textFiled；callback的是 textFiled对象本身，用于处理业务逻辑。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> to add TextField in your alert, callback the  textFiled which  you built</span></span><br><span class="line"><span class="comment"> it only support in Alert Styple</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> placeholder - set TextField's placeholder</span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> secureTextEntry - set Secure input Mode</span></span><br><span class="line"><span class="comment"> <span class="doctag">@param</span> textFiledhandler - to handle textField which you can do anything</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">- (<span class="keyword">void</span>)<span class="string">addTextFieldWithPlaceholder:</span>(NSString *_Nullable)placeholder</span><br><span class="line"><span class="symbol">                    secureTextEntry:</span>(BOOL)secureTextEntry</span><br><span class="line"><span class="symbol">                   textFiledhandler:</span>(<span class="keyword">void</span>(^_Nullable)(UITextField * _Nonnull textField))textFiledhandler;</span><br></pre></td></tr></table></figure>
+
+<h2 id="纯message-自动miss"><a href="#纯message-自动miss" class="headerlink" title="纯message 自动miss"></a>纯message 自动miss</h2><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[XWAlert showAlertWithTitle:@<span class="string">"注意"</span></span><br><span class="line"><span class="symbol">                    message:</span>@<span class="string">"这是一条不要脸的弹窗"</span></span><br><span class="line"><span class="symbol">             preferredStyle:</span>self.selectedStyle</span><br><span class="line"><span class="symbol">            autoDismissTime:</span><span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+
+<p>   <img src="http://upload-images.jianshu.io/upload_images/1805099-7ba52b232ddd9f9e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="纯文本示例"></p>
+<h2 id="新增-快速-创建-且可以自定义-style"><a href="#新增-快速-创建-且可以自定义-style" class="headerlink" title="新增 快速 创建 且可以自定义 style"></a>新增 快速 创建 且可以自定义 style</h2><figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[XWAlert showAlertWithTitle:@<span class="string">"title"</span></span><br><span class="line"><span class="symbol">                    message:</span>@<span class="string">"message"</span></span><br><span class="line"><span class="symbol">               confirmTitle:</span>@<span class="string">"default style"</span></span><br><span class="line"><span class="symbol">                cancelTitle:</span>@<span class="string">"cancel style"</span></span><br><span class="line"><span class="symbol">           destructiveTitle:</span>@<span class="string">"destructive style"</span></span><br><span class="line"><span class="symbol">             preferredStyle:</span>self.selectedStyle</span><br><span class="line"><span class="symbol">              confirmHandle:</span>^&#123;</span><br><span class="line">                  </span><br><span class="line">                NSLog(@<span class="string">"------- default style"</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="symbol">               cancleHandle:</span>^&#123;</span><br><span class="line">                NSLog(@<span class="string">"------- cancel style"</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="symbol">          destructiveHandle:</span>^&#123;</span><br><span class="line">                NSLog(@<span class="string">"------- destructive style"</span>);</span><br><span class="line"></span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1805099-06993d4ae22a29ab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/375" alt="示范图"></p>
+<h2 id="CocoaPods-安装"><a href="#CocoaPods-安装" class="headerlink" title="CocoaPods 安装"></a>CocoaPods 安装</h2><p><code>pod &#39;XWAlert&#39;, &#39;~&gt; 1.3&#39;</code></p>
+<p><code>#import &lt;XWAlert.h&gt;</code></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><blockquote>
+<p>这只是自己设计出来的一种方案，实现了AlertViewController的大部分功能。<br>在使用的过程有任何问题都可以向我提出<br>如果大家有更加好的方案和思路，希望把地址发出来，一起参考学习。</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/CivelXu/XWAlert" target="_blank" rel="noopener">GitHub - demo</a></li>
+<li><a href="http://www.jianshu.com/p/60460d3a6be5" target="_blank" rel="noopener">简书</a></li>
+<li><a href="http://civelxu.com/2016/06/12/AlertViewController%20的快速调用，看我就够了%E3%80%82/">个人博客</a></li>
+</ul>
+<p>最后, 如果觉得对你有所帮助，还希望大家对我进行支持。😊😊</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AlertViewController/" rel="tag"># AlertViewController</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/28/iOS 基础知识(面试)深度理解/" rel="next" title="iOS 基础知识(面试)深度理解">
+                <i class="fa fa-chevron-left"></i> iOS 基础知识(面试)深度理解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/18/iOS 使用 Lame 转码 MP3 的最正确姿势/" rel="prev" title="iOS 使用 Lame 转码 MP3 的最正确姿势">
+                iOS 使用 Lame 转码 MP3 的最正确姿势 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xuxiwen</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速创建"><span class="nav-number">2.</span> <span class="nav-text">快速创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义UIAlertAction-数量种类不限"><span class="nav-number">3.</span> <span class="nav-text">自定义UIAlertAction 数量种类不限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#纯message-自动miss"><span class="nav-number">4.</span> <span class="nav-text">纯message 自动miss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新增-快速-创建-且可以自定义-style"><span class="nav-number">5.</span> <span class="nav-text">新增 快速 创建 且可以自定义 style</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CocoaPods-安装"><span class="nav-number">6.</span> <span class="nav-text">CocoaPods 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">7.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xuxiwen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="了解 AsyncDisplayKit AsyncDisplayKit的基本单位是节点 Node。一个Asdisplaynode 是 UIView 的抽象，反过来是CALayer抽象。与只能在主线程上使用的 UIView 视图不同，节点是线程安全的：您可以在后台线程上并行地实例化和配置它们的整个层次结构。为了保持它的用户界面流畅和响应，你的应用程序应该以每秒60帧的速度呈现。这意味着主线程有六十分之">
+<meta name="keywords" content="AsyncDisplayKit,Texture">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AsyncDisplayKit 初窥">
+<meta property="og:url" content="http://civelxu.com/2017/09/28/AsyncDisplayKit 初窥/index.html">
+<meta property="og:site_name" content="CivelXu&#39;s Blog">
+<meta property="og:description" content="了解 AsyncDisplayKit AsyncDisplayKit的基本单位是节点 Node。一个Asdisplaynode 是 UIView 的抽象，反过来是CALayer抽象。与只能在主线程上使用的 UIView 视图不同，节点是线程安全的：您可以在后台线程上并行地实例化和配置它们的整个层次结构。为了保持它的用户界面流畅和响应，你的应用程序应该以每秒60帧的速度呈现。这意味着主线程有六十分之">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-05-17T05:40:58.433Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AsyncDisplayKit 初窥">
+<meta name="twitter:description" content="了解 AsyncDisplayKit AsyncDisplayKit的基本单位是节点 Node。一个Asdisplaynode 是 UIView 的抽象，反过来是CALayer抽象。与只能在主线程上使用的 UIView 视图不同，节点是线程安全的：您可以在后台线程上并行地实例化和配置它们的整个层次结构。为了保持它的用户界面流畅和响应，你的应用程序应该以每秒60帧的速度呈现。这意味着主线程有六十分之">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://civelxu.com/2017/09/28/AsyncDisplayKit 初窥/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>AsyncDisplayKit 初窥 | CivelXu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CivelXu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://civelxu.com/2017/09/28/AsyncDisplayKit 初窥/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xuxiwen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CivelXu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AsyncDisplayKit 初窥
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-09-28 11:41:10" itemprop="dateCreated datePublished" datetime="2017-09-28T11:41:10+08:00">2017-09-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-17 13:40:58" itemprop="dateModified" datetime="2019-05-17T13:40:58+08:00">2019-05-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Texture/" itemprop="url" rel="index"><span itemprop="name">Texture</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="了解-AsyncDisplayKit"><a href="#了解-AsyncDisplayKit" class="headerlink" title="了解 AsyncDisplayKit"></a>了解 AsyncDisplayKit</h2><blockquote>
+<p>AsyncDisplayKit的基本单位是节点 Node。一个Asdisplaynode 是 UIView 的抽象，反过来是CALayer抽象。与只能在主线程上使用的 UIView 视图不同，节点是线程安全的：您可以在后台线程上并行地实例化和配置它们的整个层次结构。<br>为了保持它的用户界面流畅和响应，你的应用程序应该以每秒60帧的速度呈现。这意味着主线程有六十分之一秒把每帧。这是16毫秒执行所有的布局和绘图代码！而且由于系统开销，您的代码通常不到十毫秒才能运行它导致帧下降。<br>AsyncDisplayKit 让你 Image 解码、文本大小和渲染，布局，和其他昂贵的UI操作关闭主线程，让主线程可以响应用户交互。</p>
+</blockquote>
+<p>这段话翻译于 <strong>AsyncDisplayKit</strong> GitHub 的介绍, 我们可以 通过 <code>CocoaPods</code> or <code>Carthage</code> 安装使用; 另外 目前  AsyncDisplayKit 已经改名为 <strong>Texture</strong>。</p>
+<a id="more"></a>
+
+<p>关于 AsyncDisplayKit 的更多深层的理解, 本人参考了以下 文章</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/25371361" target="_blank" rel="noopener">AsyncDisplayKit介绍之一: 原理和思路</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/25371361" target="_blank" rel="noopener">AsyncDisplayKit系列之二：布局系统</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/29537687" target="_blank" rel="noopener">AsyncDisplayKit系列之三：深度优化列表性能</a></li>
+<li><a href="http://www.jianshu.com/p/afc69cd9e824" target="_blank" rel="noopener">AsyncDisplaykit2.0使用「复杂界面流畅性」</a></li>
+<li><a href="http://www.jianshu.com/p/e5761e9a7850" target="_blank" rel="noopener">AsyncDisplayKit 系列教程 —— 集成、示例</a></li>
+<li><a href="http://www.cocoachina.com/ios/20170809/20182.html" target="_blank" rel="noopener">AsyncDisplayKit近一年的使用体会及疑难点</a></li>
+</ul>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>为了更加深入理解 AsyncDisplayKit 这个框架, 我尝试 进行 AsyncDisplayKit的简单使用<br>基于</p>
+<p><strong>AsyncDisplayKit</strong> 2.2.1<br><strong>Swift</strong> 4.0</p>
+<h3 id="ASTextNode"><a href="#ASTextNode" class="headerlink" title="ASTextNode"></a>ASTextNode</h3><p> ASTextNode 相当于 UILabel , 不同的是 它不能设置 text 只能设置 attributedText</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MARK:- Use ASTextNode</span></span><br><span class="line">   func buildTextNode(<span class="string">textContent:</span> String)  &#123;</span><br><span class="line">       let textLabel = ASTextNode()</span><br><span class="line">       <span class="keyword">if</span> !textContent.isEmpty &#123;</span><br><span class="line">           textLabel.attributedText = NSAttributedString(<span class="string">string:</span> textContent, <span class="string">attributes:</span></span><br><span class="line">               [NSAttributedStringKey.<span class="string">foregroundColor :</span> UIColor.white,</span><br><span class="line">                NSAttributedStringKey.<span class="string">font :</span> UIFont.systemFont(<span class="string">ofSize:</span> <span class="number">16</span>),</span><br><span class="line">                NSAttributedStringKey.<span class="string">backgroundColor :</span> UIColor.black]</span><br><span class="line">           )</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       let <span class="string">margin:</span>CGFloat = <span class="number">15</span></span><br><span class="line">       let <span class="string">width:</span>CGFloat = XW_SCREEN_WIDTH - margin * <span class="number">2</span></span><br><span class="line">       </span><br><span class="line">       textLabel.layoutThatFits(ASSizeRange.init(<span class="string">min:</span> CGSize.init(<span class="string">width:</span> width, <span class="string">height:</span> <span class="number">30</span>), <span class="string">max:</span> CGSize.init(<span class="string">width:</span> width, <span class="string">height:</span> <span class="number">300</span>)))</span><br><span class="line">       textLabel.frame = CGRect.init(<span class="string">x:</span> margin, <span class="string">y:</span> <span class="number">90</span>, <span class="string">width:</span> textLabel.calculatedSize.width, <span class="string">height:</span> textLabel.calculatedSize.height)</span><br><span class="line">       </span><br><span class="line">       self.view.addSubnode(textLabel)</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们 可以使用 <strong>layoutThatFits</strong> 来自行计算, 自适应 label的内容 , ASSizeRange 来限定 最小 和最大的 size<br>然后, 设置frame 我们可以直接获取到  <strong>calculatedSize</strong> , 是不是 还是蛮方便的呢 ?<br>最后 使用 <strong>.addSubnode</strong> 代替 <strong>.addSubView</strong> </p>
+<h3 id="ASImageNode"><a href="#ASImageNode" class="headerlink" title="ASImageNode"></a>ASImageNode</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MARK:- Use ASImageNode</span></span><br><span class="line">func buildImageNode(imageURLString: String) &#123;</span><br><span class="line">    let imageView = ASNetworkImageNode()</span><br><span class="line">    imageView<span class="selector-class">.frame</span> = CGRect.init(x: <span class="number">80</span>, y: <span class="number">400</span>, <span class="attribute">width</span>: <span class="number">200</span>, height: <span class="number">200</span>)</span><br><span class="line">    imageView<span class="selector-class">.backgroundColor</span> = UIColor.green</span><br><span class="line">    imageView<span class="selector-class">.contentMode</span> = .scaleAspectFill</span><br><span class="line">    <span class="keyword">if</span> !imageURLString<span class="selector-class">.isEmpty</span> &#123;</span><br><span class="line">        imageView<span class="selector-class">.url</span> = URL.init(string: imageURLString)</span><br><span class="line">    &#125;</span><br><span class="line">    self<span class="selector-class">.view</span><span class="selector-class">.addSubnode</span>(imageView)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果 你使用本地 的image 可能你只需要 使用 <strong>ASImageNode</strong><br>但是加载 网络图片 就需要 使用到 <strong>ASNetworkImageNode</strong></p>
+<p>ASNetworkImageNode 默认用的缓存机制和图片下载器是 PinRemoteImage，为了使用我们自己的缓存机制和图片下载器，需要实现 ASImageCacheProtocol 图片缓存协议和 ASImageDownloaderProtocol 图片下载器协议两个协议</p>
+<h3 id="ASButtonNode"><a href="#ASButtonNode" class="headerlink" title="ASButtonNode"></a>ASButtonNode</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MARK:- Use ASButtonNode</span></span><br><span class="line">   func buildButtonNode(buttonName: String) &#123;</span><br><span class="line">       let buttonNode = ASButtonNode()</span><br><span class="line">       <span class="keyword">if</span> !buttonName<span class="selector-class">.isEmpty</span> &#123;</span><br><span class="line">           buttonNode.setTitle(buttonName, with: UIFont.systemFont(ofSize: <span class="number">14</span>), with: UIColor<span class="selector-class">.black</span>, <span class="keyword">for</span>: UIControlState.<span class="attribute">normal</span>)</span><br><span class="line">       &#125;</span><br><span class="line">       buttonNode<span class="selector-class">.backgroundColor</span> = UIColor.yellow</span><br><span class="line">       buttonNode<span class="selector-class">.frame</span> = CGRect.init(x: <span class="number">80</span>, y: <span class="number">640</span>, <span class="attribute">width</span>: <span class="number">200</span>, height: <span class="number">30</span>)</span><br><span class="line">       buttonNode.addTarget(self, action: #selector(clickedButton(sender:)), forControlEvents: .touchUpInside)</span><br><span class="line">       self<span class="selector-class">.view</span><span class="selector-class">.addSubnode</span>(buttonNode)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要 注意 ASButtonNode 继承于 ASControlNode 可以设置 add target, 有属性<br><code>ASTextNode  * titleNode;</code> <code>ASImageNode * imageNode;</code> <code>ASImageNode * backgroundImageNode;</code></p>
+<h3 id="ASControlNode"><a href="#ASControlNode" class="headerlink" title="ASControlNode"></a>ASControlNode</h3><p>ASImageNode、ASButtonNode、ASTextNode 同为 ASControlNode 子类，可以直接使用 .addTarget(self, action: “handleXXX”, forControlEvents: .TouchUpInside) 为它们添加点击响应事件，而避免使用addGesture等方法。</p>
+<h3 id="ASTableNode"><a href="#ASTableNode" class="headerlink" title="ASTableNode"></a>ASTableNode</h3><p>我们可以使用 ASTableNode 来 着力解决 UITableView 在 ReloadData 耗时长以及滑动卡顿的性能问题</p>
+<p>初始化 <code>let tableView = ASTableNode.init(style: UITableViewStyle.plain)</code><br>代理  <code>ASTableViewDataSource, ASTableViewDelegate</code></p>
+<p>ASTableDataSource</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MARK:- ASTableDataSource</span></span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">numberOfSections</span><span class="params">(<span class="keyword">in</span> tableNode: ASTableNode)</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">       <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">tableNode</span><span class="params">(<span class="number">_</span> tableNode: ASTableNode, numberOfRowsInSection section: Int)</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">       <span class="keyword">return</span> mockData.<span class="built_in">count</span></span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">tableNode</span><span class="params">(<span class="number">_</span> tableNode: ASTableNode, nodeForRowAt indexPath: IndexPath)</span></span> -&gt; <span class="type">ASCellNode</span> &#123;</span><br><span class="line">       <span class="keyword">let</span> cellNode = <span class="type">CustomCellNode</span>()</span><br><span class="line">       <span class="keyword">return</span> cellNode</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    .....</span><br></pre></td></tr></table></figure>
+
+<p>ASTableDataSource</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MARK:-  ASTableDelegate</span></span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">tableNode</span><span class="params">(<span class="number">_</span> tableNode: ASTableNode, didSelectRowAt indexPath: IndexPath)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">func</span> <span class="title">tableNode</span><span class="params">(<span class="number">_</span> tableNode: ASTableNode, willDisplayRowWith node: ASCellNode)</span></span> &#123;</span><br><span class="line">   </span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> .....</span><br></pre></td></tr></table></figure>
+
+<p>需要注意 ASTableNode 的高度计算以及布局都在 ASCellNode 中实现，与 ASTableNode 是完全解耦的。<br>ASTableNode 中所有的元素都不支持 AutoLayout、AutoResizing，也不支持StoryBoard、IB。<br>ASTableNode 完全可以将滑动性能提升至60FPS。<br>ASTableNode 实质上是一个 ScrollView ，其中添加有指定数的 ASDisplayNode，在屏幕滚动时，离屏的ASDisplayNode内容会被暂时释放，在屏或接近在屏的ASDisplayNode会被提前加载。因此，ASTableView 不存在 Cell 复用的问题，也不存在任何 Cell 复用。</p>
+<h3 id="ASCellNode"><a href="#ASCellNode" class="headerlink" title="ASCellNode"></a>ASCellNode</h3><p>通常我们 自定义 UITableViewCell 是继承于 ASCellNode<br>执行以下步骤</p>
+<ul>
+<li><code>override init()</code> 创建 对应 的 node, 添加进去</li>
+<li>添加数据 function</li>
+<li><code>override func calculateSizeThatFits(_ constrainedSize: CGSize) -&gt; CGSize</code> 计算控件宽度和高度，并返回 Cell 的高度, 我们一般 需要计算的 东西 都是在这个方法里面进行 <code>layoutThatFits</code></li>
+<li><code>override func layout()</code> 各个控件 进行布局 , 通常 调用 <code>calculatedSize</code> 进行 自适应布局</li>
+</ul>
+<h3 id="ASDisplayNode"><a href="#ASDisplayNode" class="headerlink" title="ASDisplayNode"></a>ASDisplayNode</h3><p>对于一些 不支持 的控件,  列如 UISlider, UISwitch, UIActivityIndicatorView, 并没有对应的 ASDisplayNode 子类实现。因此，我们需要创建一个 ASDisplayNode ，使用block方法返回;</p>
+<p>这里以一个  <code>UIActivityIndicatorView</code> 为例</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> activityIndicator = ASDisplayNode.init<span class="function"><span class="params">(viewBlock: &#123; () -&gt; UIView <span class="keyword">in</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">let</span> view = UIActivityIndicatorView(activityIndicatorStyle: .gray)</span></span></span><br><span class="line"><span class="function"><span class="params">    view.backgroundColor = UIColor.clear</span></span></span><br><span class="line"><span class="function"><span class="params">    view.hidesWhenStopped = <span class="literal">true</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">return</span> view</span></span></span><br><span class="line"><span class="function"><span class="params">&#125;)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>使用同样的方法，可以添加任意类型 UIView 到 CellNode 中，这样就不需要被 AsyncDisplayKit 束缚我们的应用了。</p>
+<h2 id="使用感想"><a href="#使用感想" class="headerlink" title="使用感想"></a>使用感想</h2><p>首先, 本文只是对 AsyncDisplayKit 的一些基础 控件 进行初窥使用; 通过 Node 的使用方式 和 UIView 有着 相似 的一些 代码 特性; Node 会暴露 出 view 的一些基础属性 和 UIView 使用一样, 这令我们的学习成本 有一定降低; 一些不会明显暴露的属性,也可以通过 node.view 来获取到, 让初次接触 框架的人 比较容易上手。</p>
+<p>其次, AsyncDisplayKit 是线程 绝对 安全的, 能保证 一些复杂的界面也稳定 60fps 运行, 开发者不比去考虑 Image 解码、文本大小和渲染等 带来的线程堵塞, 有利于程序的性能优化。 同事 使用 AsyncDisplayKit 来开发, 代码的条理 变得 清晰, 通过 ASCellNode 能够完全和 ASTableNode 进行解耦来看, 各种优点会让程序变得更加容易维护。</p>
+<p>于此同时, AsyncDisplayKit 带来的负面影响也是不容忽视的;由于ASDK的基本理念是在需要创建UIView时替换成对应的Node来获取性能提升，因此对于现有代码改动较大，侵入性较高，同时由于大量原本熟悉的操作变成了异步的，对于一个团队来说学习曲线也较为陡峭。</p>
+<p>AsyncDisplayKit 不支持 AutoLayout、AutoResizing，也不支持StoryBoard、IB。这 似乎 与 Apple 的理念相违背; Apple 是鼓励使用 可视化进行编程的。</p>
+<p>综合来分析, AsyncDisplayKit 是一个非常的不错框架; 考虑到AsyncDisplayKit的种种好处，非常推荐AsyncDisplayKit，当然还是仅限于用在比较复杂和动态的页面中。不需要也不可能将所有UIView都替换成其Node版本。将注意力集中在可能造成主线程阻塞的地方，如tableView/collectionView、复杂布局的View、使用连续手势的操作等等。  </p>
+<h2 id="Link"><a href="#Link" class="headerlink" title="Link"></a>Link</h2><ul>
+<li><a href="http://civelxu.com/2017/09/10/iOS%20雷达扫描效果/">个人博客</a></li>
+<li><a href="http://www.jianshu.com/p/75498fdc2974" target="_blank" rel="noopener">简书</a></li>
+<li><a href="https://github.com/CivelXu/UseAsyncDisplayKit-Practice" target="_blank" rel="noopener">GitHub Code</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AsyncDisplayKit/" rel="tag"># AsyncDisplayKit</a>
+          
+            <a href="/tags/Texture/" rel="tag"># Texture</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/18/iOS 使用 Lame 转码 MP3 的最正确姿势/" rel="next" title="iOS 使用 Lame 转码 MP3 的最正确姿势">
+                <i class="fa fa-chevron-left"></i> iOS 使用 Lame 转码 MP3 的最正确姿势
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/24/iOS 多个Target保持版本号一致的设置/" rel="prev" title="iOS 多个Target保持版本号一致的设置">
+                iOS 多个Target保持版本号一致的设置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xuxiwen</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#了解-AsyncDisplayKit"><span class="nav-number">1.</span> <span class="nav-text">了解 AsyncDisplayKit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ASTextNode"><span class="nav-number">2.1.</span> <span class="nav-text">ASTextNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASImageNode"><span class="nav-number">2.2.</span> <span class="nav-text">ASImageNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASButtonNode"><span class="nav-number">2.3.</span> <span class="nav-text">ASButtonNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASControlNode"><span class="nav-number">2.4.</span> <span class="nav-text">ASControlNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASTableNode"><span class="nav-number">2.5.</span> <span class="nav-text">ASTableNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASCellNode"><span class="nav-number">2.6.</span> <span class="nav-text">ASCellNode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASDisplayNode"><span class="nav-number">2.7.</span> <span class="nav-text">ASDisplayNode</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用感想"><span class="nav-number">3.</span> <span class="nav-text">使用感想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Link"><span class="nav-number">4.</span> <span class="nav-text">Link</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xuxiwen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是KVC,什么是KVO,他们之间关系.底层实现 键值编码 Key-Value-Coding(KVC)  键值编码是一种使用字符串来标识属性，间接访问对象的属性，而不是通过调用存取方法，直接或通过实例变量访问的机制，非对象类型的变量将被自动封装或者解封成对象，很多情况下会简化程序代码；KVC的缺点：一旦使用 KVC 你的编译器无法检查出错误,即不会对设置的键、键路径进行错误检查,且执行效率要低于">
+<meta name="keywords" content="iOS面试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 基础知识(面试)深度理解">
+<meta property="og:url" content="http://civelxu.com/2016/06/28/iOS 基础知识(面试)深度理解/index.html">
+<meta property="og:site_name" content="CivelXu&#39;s Blog">
+<meta property="og:description" content="什么是KVC,什么是KVO,他们之间关系.底层实现 键值编码 Key-Value-Coding(KVC)  键值编码是一种使用字符串来标识属性，间接访问对象的属性，而不是通过调用存取方法，直接或通过实例变量访问的机制，非对象类型的变量将被自动封装或者解封成对象，很多情况下会简化程序代码；KVC的缺点：一旦使用 KVC 你的编译器无法检查出错误,即不会对设置的键、键路径进行错误检查,且执行效率要低于">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-05-17T05:51:43.187Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS 基础知识(面试)深度理解">
+<meta name="twitter:description" content="什么是KVC,什么是KVO,他们之间关系.底层实现 键值编码 Key-Value-Coding(KVC)  键值编码是一种使用字符串来标识属性，间接访问对象的属性，而不是通过调用存取方法，直接或通过实例变量访问的机制，非对象类型的变量将被自动封装或者解封成对象，很多情况下会简化程序代码；KVC的缺点：一旦使用 KVC 你的编译器无法检查出错误,即不会对设置的键、键路径进行错误检查,且执行效率要低于">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://civelxu.com/2016/06/28/iOS 基础知识(面试)深度理解/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>iOS 基础知识(面试)深度理解 | CivelXu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CivelXu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://civelxu.com/2016/06/28/iOS 基础知识(面试)深度理解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xuxiwen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CivelXu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS 基础知识(面试)深度理解
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-06-28 21:07:20" itemprop="dateCreated datePublished" datetime="2016-06-28T21:07:20+08:00">2016-06-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-17 13:51:43" itemprop="dateModified" datetime="2019-05-17T13:51:43+08:00">2019-05-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS面试/" itemprop="url" rel="index"><span itemprop="name">iOS面试</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="什么是KVC-什么是KVO-他们之间关系-底层实现"><a href="#什么是KVC-什么是KVO-他们之间关系-底层实现" class="headerlink" title="什么是KVC,什么是KVO,他们之间关系.底层实现"></a>什么是KVC,什么是KVO,他们之间关系.底层实现</h2><p> <strong>键值编码 Key-Value-Coding(KVC)</strong></p>
+<blockquote>
+<p>键值编码是一种使用字符串来标识属性，间接访问对象的属性，而不是通过调用存取方法，直接或通过实例变量访问的机制，非对象类型的变量将被自动封装或者解封成对象，很多情况下会简化程序代码；KVC的缺点：一旦使用 KVC 你的编译器无法检查出错误,即不会对设置的键、键路径进行错误检查,且执行效率要低于合成存取器方法和自定的 setter 和 getter 方法。因为使用 KVC 键值编码,它必须先解析字符串,然后在设置或者访问对象的实例变量。</p>
+</blockquote>
+<a id="more"></a>
+
+<p> <strong>实现分析</strong></p>
+<p> KVC运用了一个isa-swizzling技术。isa-swizzling就是类型混合指针机制。KVC主要通过isa-swizzling，来实现其内部查找定位的。isa指针，如其名称所指，（就是is a kind of的意思），指向维护分发表的对象的类。该分发表实际上包含了指向实现类中的方法的指针，和其它数据。</p>
+<p>比如说如下的一行KVC的代码：<br>[site setValue:@”sitename” forKey:@”name”];<br>就会被编译器处理成：<br>SEL sel = sel_get_uid (“setValue:forKey:”);<br>IMP method = objc_msg_lookup (site-&gt;isa,sel);<br>method(site, sel, @”sitename”, @“name”);</p>
+<p>一个对象在调用setValue的时候，<br>（1）首先根据方法名找到运行方法的时候所需要的环境参数。<br>（2）他会从自己isa指针结合环境参数，找到具体的方法实现的接口。<br>（3）再直接查找得来的具体的方法实现。</p>
+<p><strong>键值观察 Key-Value Observing (KVO)</strong></p>
+<blockquote>
+<p>键值观察机制是一种能使得对象获取到其他对象属性变化的通知 ，极大的简化了代码。<br>实现 KVO 键值观察模式,被观察的对象必须使用 KVC 键值编码来修 改它的实例变量,这样才能被观察者观察到。因此,KVC是KVO的基础。</p>
+</blockquote>
+<p> <strong>实现分析 :</strong><br>KVO的实现是基于runtime运行时的<br>1、当一个object有观察者时，动态创建这个object的类的子类在addObserver:forKeyPath:options:context:之后。对象的isa变为了子类派生类NSKVONotifying_XX。实际上是对象p的isa即NSKVONotifying_XX类的setAge方法，并非原类的setAge方法。<br>2、对于每个被观察的property，重写其set方法<br>3、在重写的set方法中调用- willChangeValueForKey:和- didChangeValueForKey:通知观察者<br>4、当一个property没有观察者时，删除重写的方法<br>5、当没有observer观察任何一个property时，删除动态创建的子类</p>
+<h2 id="什么是block-delegate-通知中心Notification-使用区别"><a href="#什么是block-delegate-通知中心Notification-使用区别" class="headerlink" title="什么是block,delegate,通知中心Notification,使用区别"></a>什么是block,delegate,通知中心Notification,使用区别</h2><p> <strong>block</strong><br>block被ObjC看成是对象，它封装了一段代码，这段代码可以在任何时候执行。Blocks可以作为函数参数或者函数的返回值，而其本身又可以带输入参数或返回值。它和传统的函数指针很类似，但是有区别：blocks是inline的，并且它对局部变量是只读的。block类似一些其它Web编程语言中的“匿名函数”。在objc中通常使用block实现代理方法实现的功能，也就是回调。使用代理需要设置代理的数据接收者，而且代理方法是被分离开来处理的，block可以将这些分离的代码放到一个代码块中。</p>
+<p><strong>delegate</strong><br>delegate,又称委托或者代理,它是一种设计模式.delegate主要是用于两个对象之间的交互,并且解除两个通信对象的耦合性,iOS大量使用代理模式,主要是用于视图与使用对象之间的通信交互.</p>
+<p><strong>官方文档翻译解释:</strong><br>代理是一种简单而功能强大的设计模式，这种模式用于一个对象“代表”另外一个对象和程序中其他的对象进行交互。 主对象（这里指的是delegating object）中维护一个代理（delegate）的引用并且在合适的时候向这个代理发送消息。这个消息通知“代理”主对象即将处理或是已经处理完了某一个事件。这个代理可以通过更新自己或是其它对象的UI界面或是其它状态来响应主对象所发送过来的这个事件的消息。或是在某些情况下能返回一个值来影响其它即将发生的事件该如何来处理。代理的主要价值是它可以让你容易的定制各种对象的行为。注意这里的代理是个名词，它本身是一个对象，这个对象是专门代表被代理对象来和程序中其他对象打交道的。委托是objC中使用非常频繁的一种设计模式，它的实现与协议的使用是分不开的.</p>
+<p><strong>Notification</strong><br>通知中心概述:通知中心实际上是在程序内部提供了消息广播的一种机制。通知中心不能在进程间进行通信。实际上就是一个二传手，把接收到的消息，根据内部的一个消息转发表，来将消息转发给需要的对象。通知中心是基于观察者模式的，它允许注册、删除观察者。<br>一个NSNotificationCenter可以有许多的通知消息NSNotification，对于每一个NSNotification可以有很多的观察者Observer来接收通知。</p>
+<p> <strong>使用区别</strong></p>
+<p><code>delegate与block一般用于两个对象1对1之间的通信交互、delegate需要定义协议方法，代理对象需要实现协议方法并且需要建立代理关系才可以实现通信。
+block更加简洁，不需要定义繁琐的协议方法,但是如果通信时间比较多的话,建议使用delgate。
+Notfication主要用于1对多的通信，而且通信对象之间不需要建立关系，但是使用通知，代码的可读性差。</code></p>
+<h2 id="内存管理MRC、ARC管理机制的区别"><a href="#内存管理MRC、ARC管理机制的区别" class="headerlink" title="内存管理MRC、ARC管理机制的区别"></a>内存管理MRC、ARC管理机制的区别</h2><p><strong>iOS中采用的是引用计数的机制来管理内存，如果一块内存区域的引用计数不为0，那么就说明有对象持或者是在使用这一块内存，如果引用计数为0的话那么说明这块内存没有对象使用，可以被系统回收掉。iOS借助于引用计数的增减来辅助我们进行内存的申请和释放.</strong></p>
+<blockquote>
+<p>内存管理的原则：<br>1、自己创建的对象，自己可以持有（比如以alloc、new、copy、mutableCopy开头的方法可以创建对象）；<br>2、不是自己创建的对象也可以持有，通过retain；<br>3、自己持有的对象在不需要使用的时候要负责释放、释放可以通过release或者是autorelease进行释放，<br>4、不是自己持有的对象不能进行释放，比如便利构造器得到的对象。</p>
+</blockquote>
+<p> 在内存管理的过程中我们需要谨记的原则就是我们造成的引用计数的增加和我们造成的引用计数的减少要保持一致。在我们使用属性的过程中，要注意不同的语义控制（assign、retain、copy）的setter方法实现的不同，对于retain和copy来说，他们的内部实现都是先把旧值release和把新值retain。另外对于发送autorelease消息的对象会被加到最近的自动释放池中，当自动释放池释放的时候，会给里面的所有对象发送一次release消息。iOS5.0之后苹果推出了ARC、ARC是编译器的特性，不是OC的语言特性，是编译器在静态编译的基础上（command ＋ shift ＋ B），编译器在合适的地方给我们加了retain、release、autorelease这些代码，不用我们自己去手动写这些代码了。ARC中属性的关键字是strong和weak，其中strong和MRC下的retain作用相同，都是持有一个对象，weak和MRC下的assigin类型，是一个弱引用，不持有一个对象，但是weak只能修饰对象类型，不能修饰基本类型，并且weak会在指向的对象被销毁的时候指针自动置nil。</p>
+<h2 id="import、-include、-class、-import-lt-gt-和-import””的区别"><a href="#import、-include、-class、-import-lt-gt-和-import””的区别" class="headerlink" title="#import、#include、@class、#import&lt;&gt;和#import””的区别"></a>#import、#include、@class、#import&lt;&gt;和#import””的区别</h2><p><strong>import</strong> </p>
+<ul>
+<li>是 Objective-C 导入头文件的关键字，完整地包含某个文件的内容 </li>
+<li>会自动导入一次，不会重复导入</li>
+<li>不会引发交叉编译; 因为在 Objective-C 中会存在C/C++和Objective-C 混编的问题，如果用 #include 引入头文件，会导致交叉编译。<ul>
+<li>include </li>
+</ul>
+</li>
+<li>C/C++ 导入头文件的关键字，完整地包含某个文件的内容<ul>
+<li>@class  1. 仅仅是声明一个类名，并不会包含类的完整声明2.能解决循环包含的问题：当两个类文件有循环依赖关系 ( A 引用 B , B 引用 A ) 时，需要用 @class</li>
+</ul>
+</li>
+</ul>
+<p><strong>import&lt;&gt; 和 import””</strong>  </p>
+<ul>
+<li>&lt;&gt; : 引用系统文件，它用于对系统自带的头文件的引用，编译器会在系统文件目录下去查找该文件. </li>
+<li>“”: 用户自定义的文件用双引号引用，编译器首先会在用户目录下查找，然后到安装目录中查 </li>
+</ul>
+<h2 id="iOS-assign，weak，strong，copy-atomic-nonatomic详解"><a href="#iOS-assign，weak，strong，copy-atomic-nonatomic详解" class="headerlink" title="iOS assign，weak，strong，copy ,atomic, nonatomic详解"></a>iOS assign，weak，strong，copy ,atomic, nonatomic详解</h2><p><strong>assign 与weak区别</strong> </p>
+<ul>
+<li>assign适用于基本数据类型，weak是适用于NSObject对象，并且是一个弱引用。assign其实也可以用来修饰对象。那么我们为什么不用它修饰对象呢？因为被assign修饰的对象（一般编译的时候会产生警告：Assigning retained object to unsafe property; object will be released after assignment）在释放之后，指针的地址还是存在的，也就是说指针并没有被置为nil，造成野指针。对象一般分配在堆上的某块内存，如果在后续的内存分配中，刚好分到了这块地址，程序就会崩溃掉。</li>
+<li>那为什么可以用assign修饰基本数据类型？因为基础数据类型一般分配在栈上，栈的内存会由系统自己自动处理，不会造成野指针。weak修饰的对象在释放之后，指针地址会被置为nil。所以现在一般弱引用就是用weak。</li>
+<li>weak使用场景：在ARC下,在有可能出现循环引用的时候，往往要通过让其中一端使用weak来解决，比如: delegate代理属性，通常就会声明为weak。自身已经对它进行一次强引用，没有必要再强引用一次时也会使用weak。比如：自定义 IBOutlet控件属性一般也使用weak，当然也可以使用strong。</li>
+</ul>
+<p><strong>strong 与copy的区别</strong></p>
+<ul>
+<li>strong 与copy都会使引用计数(retain)加1，但strong是两个指针指向同一个内存地址，copy会在内存里拷贝一份对象，两个指针指向不同的内存地址<ul>
+<li><strong>block与</strong>weak的区别</li>
+</ul>
+</li>
+<li><strong>block是用来修饰一个变量，这个变量就可以在block中被修改  __block：使用 __block修饰的变量在block代码块中会被retain（ARC下会retain，MRC下不会retain）</strong>weak：使用__weak修饰的变量不会在block代码块中被retain   同时，在ARC下，要避免block出现循环引用 __weak typedof(self)weakSelf = self;<ul>
+<li>block变量定义时为什么用copy？block是放在哪里的？ </li>
+</ul>
+</li>
+<li>block的循环引用并不是strong导致的…在ARC环境下，系统底层也会做一次copy操作使block从栈区复制一块内存空间到堆区…所以strong和copy在对block的修饰上是没有本质区别的，只不过copy操作效率高而已</li>
+</ul>
+<p><strong>nonatomic/atomic</strong></p>
+<ul>
+<li>atomic的意思就是setter/getter这两个函数的一个原语操作。如果有多个线程同时调用setter的话，不会出现某一个线程执行setter全部语句之前，另一个线程开始执行setter情况，相当于函数头尾加了锁一样。 nonatomic不保证setter/getter的原语行，所以你可能会取到不完整的东西。 比如setter函数里面改变两个成员变量，如果你用nonatomic的话，getter可能会取到只更改了其中一个变量时候的状态。 atomic是线程安全的,nonatomic是线程不安全的。如果只是单线程操作的话用nonatomic最好,因为后者效率高一些。</li>
+</ul>
+<h2 id="OC之面向对象的三大特征"><a href="#OC之面向对象的三大特征" class="headerlink" title="OC之面向对象的三大特征"></a>OC之面向对象的三大特征</h2><ul>
+<li>封装</li>
+</ul>
+<p>封装是对象和类概念的主要特性。它是隐藏内部实现，稳定外部接口，可以看作是“包装”。封装，也就是把客观事物封装成抽象的类，并且类可以把自己的数据和方法只让可信的类或者对象操作，对不可信的进行信息隐藏。<br>好处：使用更简单变量更安全可以隐藏内部实现细节开发速度加快<br>OC中一个类可以继承另一个类，被继承的类成为超类（superclass），继承的类是子类（childclass），可以直接拥有父类中所有非私有成员（相关实例变量）、方法。继承的实现在接口中使用符号“：”。<br>举个例子：@interfaceStudent:NSObject{}不过大家要注意的是：属性封装实例变量，方法封装具体实现代码，类封装属性和方法。子类可继承父类中的方法，还可重写父类方法。</p>
+<ul>
+<li>多态</li>
+</ul>
+<p>多态性（polymorphism）是允许你将父对象设置成为和一个或更多的他的子对象相等的技术，赋值之后，父对象就可以根据当前赋值给它的子对象的特性以不同的方式运作。简单的说，就是一句话：允许将子类类型的指针赋值给父类类型的指针。不同对象以自己的方式响应相同的消息的能力叫做多态。意思就是假设生物类（life）都用有一个相同的方法-eat;那人类属于生物，猪也属于生物，都继承了life后，实现各自的eat，但是调用是我们只需调用各自的eat方法。也就是不同的对象以自己的方式响应了相同的消息（响应了eat这个选择器）。<br>实现多态，有二种方式，覆盖，重载。<br>1）覆盖：是指子类重新定义父类的虚函数的做法。<br>2）重载：是指允许存在多个同名函数，而这些函数的参数表不同（或许参数个数不同，或许参数类型不同，或许两者都不同）。</p>
+<ul>
+<li>继承</li>
+</ul>
+<p>面向对象编程(OOP)语言的一个主要功能就是“继承”。继承是指这样一种能力：它可以使用现有类的所有功能，并在无需重新编写原来的类的情况下对这些功能进行扩展。<br>通过继承创建的新类称为“子类”或“派生类”，被继承的类称为“基类”、“父类”或“超类”。继承的过程，就是从一般到特殊的过程。在考虑使用继承时，有一点需要注意，那就是两个类之间的关系应该是“属于”关系。例如，Employee是一个人，Manager也是一个人，因此这两个类都可以继承Person类。但是Leg类却不能继承Person类，因为腿并不是一个人。</p>
+<blockquote>
+<p>小结：封装可隐藏实现细节，，使代码模块化；继承可扩展已存在的代码模块（类）；它们最终需要的结果（代码重用）。多态是为了实现另一个目的（接口重用）。多态的作用，就是为了类在继承和派生的时候，保证使用“家谱”中任一类的实例的某一属性时的正确调用。</p>
+</blockquote>
+<h2 id="事件响应者链的概念-responder-chain"><a href="#事件响应者链的概念-responder-chain" class="headerlink" title="事件响应者链的概念(responder chain);"></a>事件响应者链的概念(responder chain);</h2><p>响应者链表示一系列的响应者对象.事件被交给由第一响应者对象处理,如果第一响应者不处理,事件被沿着响应者链向上传递,交给下一响应者(next responder).一般来说,第一响应者是视图对象或者其子类对象,当其被触摸后事件被交由它处理,如果它不处理,事件就会被传递给它的视图控制器对象(如果存在),然后就是它的父视图(superView)对象(如果存在),以此类推,直到顶层视图.接下来会沿着顶层视图(top view)到窗口(UIWindow对象)再到程序(UIApplication对象).如果整个过程都没有响应这个事件,该事件就会被丢弃.一般情况下,在响应者中只要由对象处理事件,事件就停止传递.但有时候可以在视图扥响应方法中根据一些条件判断来决定是否需要继续传递事件.</p>
+<h2 id="请简述对MVC-MVVM-设计模式的理解"><a href="#请简述对MVC-MVVM-设计模式的理解" class="headerlink" title="请简述对MVC / MVVM 设计模式的理解"></a>请简述对MVC / MVVM 设计模式的理解</h2><p><strong>MVC设计模式</strong></p>
+<p>Model：负责存储、定义、操作数据；<br>View：负责呈现画面以及与用户进行操作交互<br>Controller：Model和View的协调者，Controller把Model中的数据拿过来给View用。<br>Controller可以直接与Model和View进行通信，而View不能和Controller直接通信。View与Controller通信需要利用代理协议的方式，当有数据更新时，Model也要与Controller进行通信，这个时候就要用Notification和KVO，这个方式就像广播一样，Model发信号，Controller设置监听接收信号，当有数据更新时就发信号给Controller，Model和View不能直接进行通信，这样会违背MVC设计模式。</p>
+<p><strong>如何理解MVVM设计模式</strong></p>
+<p>ViewModel层，就是View和Model层的粘合剂，他是一个放置用户输入验证逻辑，视图显示逻辑，发起网络请求和其他各种各样的代码的极好的地方。说白了，就是把原来ViewController层的业务逻辑和页面逻辑等剥离出来放到ViewModel层。<br>View层，就是ViewController层，他的任务就是从ViewModel层获取数据，然后显示。</p>
+<h2 id="请简述HTTP协议中get请求和post请求的区别-同步请求和异步请求的区别"><a href="#请简述HTTP协议中get请求和post请求的区别-同步请求和异步请求的区别" class="headerlink" title="请简述HTTP协议中get请求和post请求的区别,同步请求和异步请求的区别"></a>请简述HTTP协议中get请求和post请求的区别,同步请求和异步请求的区别</h2><p><strong>get请求</strong> </p>
+<p>参数在地址后拼接，进行请求数据，不安全（因为所有参数都拼接在地址后面），不适合传输大量数据（长度限制，为256个字节）。get提交、请求的数据会附在URL之后，即把数据放置在HTTP协议头中。以分割URL和传输数据，多个参数用&amp;连接。如果数据是英文字母或数字，原样发送，如果是空格，转换为+，如果是中文/其他字符，则直接把字符串用BASE64加密。</p>
+<p><strong>post请求</strong></p>
+<p>参数在请求数据区放着，相对get请求更安全，并且数据大小没有限制(1G)。把提交的数据放置在HTTP包的包体中,转换成NSData进行传输。<br>get提交的数据会在地址栏显示出来，而post提交，地址栏不会改变。</p>
+<p> <strong>传输数据的大小:</strong></p>
+<p>get请求时，传输数据就会受到URL长度限制，POST由于不是通过URL传输，理论上不受限。</p>
+<ul>
+<li>安全性：post的安全性要比get的安全性高；通过get提交数据，用户名和密码将明文出现在URL上，比如登录界面有可能被浏览器缓存。</li>
+</ul>
+<p><strong>同步请求/异步请求</strong></p>
+<ul>
+<li>1.同步请求可以从网络请求数据，一旦发送同步请求，程序将停止与用户交互，直到服务器返回数据完成，才可以进行下一步操作；</li>
+<li>2.异步请求不会阻塞主线程，而会建立一个新的线程来操作，用户发出异步请求后，依然可以对UI进行操作，程序可以继续运行；</li>
+</ul>
+<h2 id="多线程编程NSThread-NSoperationQueue-NSObject-GCD-区别"><a href="#多线程编程NSThread-NSoperationQueue-NSObject-GCD-区别" class="headerlink" title="多线程编程NSThread/NSoperationQueue/NSObject/GCD 区别"></a>多线程编程NSThread/NSoperationQueue/NSObject/GCD 区别</h2><p><strong>单线程</strong><br><strong>只有一个线程的程序即为单线程.该线程被称为主线程.在程序一运行的时候就存在了.</strong></p>
+<p> <strong>问题:</strong><br>因为只有一个线程,所有代码的执行只能从上往下顺序执行.如果有耗时的操作(网络请求,数据解析等),会造成界面假死,影响用户体验/<br> <strong>解决:</strong><br>将一些耗时的操作放在子线程中去执行,主线程只用来UI的展示和刷新;</p>
+<p><strong>多线程</strong><br> <strong>除了主线程外,还存在其他线程的程序即为多线程程序</strong></p>
+<p><strong>注意事项:</strong><br> 所有跟UI相关的操作都必须放在主线程中;</p>
+<p><strong>问题:</strong><br> 既然多线程程序有这么多的好处,该如何开辟子线程?</p>
+<p> <strong>解决方案:</strong><br> iOS中可以使用NSThread/NSoperationQueue/NSObject/GCD来开辟子线程.</p>
+<p><strong>问题:</strong><br> 无论开辟了多少子线程,最终的目的都要回到主线程刷新UI,那么该如何从子线程回主线程?</p>
+<p>  <strong>解决方案:</strong><br>1.使用performSelectorOnMainThread方法;<br>2.使用GCD中dispatch_async(dispath_get_mainQueue(),);</p>
+<p><strong>问题:</strong><br> 既然多线程可以解决界面假死现象,那么是不是开辟的线程越多越好?<br> <strong>答:</strong><br>不是。开辟子线程需要消耗内存，而且不管开辟了多少子线程。最终都是要回到主线程的。所以开辟的子线程越多对于CPU性能的消耗越大。所以根据需要开辟适当的线程。</p>
+<p><strong>问题:</strong><br> 如何让实现线程同步(里面任务一个个执行)<br> <strong>答:</strong><br> 1.GCD里面使用串行队列.<br>2.NSOperationQueue里面当把最大并发数发送设置1的时候,也可以实现线程同步;</p>
+<blockquote>
+<p>NSObject</p>
+</blockquote>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">interface</span> NSObject (NSThreadPerformAdditions)</span><br><span class="line">- (void)performSelectorOnMainThread:(SEL)aSelector withObject:(<span class="keyword">nullable</span> id)arg waitUntilDone:(BOOL)wait modes:(<span class="keyword">nullable</span> NSArray&lt;NSString *&gt; *)<span class="keyword">array</span>;</span><br><span class="line">- (void)performSelectorOnMainThread:(SEL)aSelector withObject:(<span class="keyword">nullable</span> id)arg waitUntilDone:(BOOL)wait;</span><br><span class="line">equivalent <span class="keyword">to</span> the first <span class="function"><span class="keyword">method</span> <span class="title">with</span> <span class="title">kCFRunLoopCommonModes</span></span></span><br><span class="line"><span class="function">- <span class="params">(void)</span><span class="title">performSelector</span>:</span>(SEL)aSelector onThread:(NSThread *)thr withObject:(<span class="keyword">nullable</span> id)arg waitUntilDone:(BOOL)wait modes:(<span class="keyword">nullable</span> NSArray&lt;NSString *&gt; *)<span class="keyword">array</span> NS_AVAILABLE(<span class="number">10</span>_5, <span class="number">2</span>_0);</span><br><span class="line">- (void)performSelector:(SEL)aSelector onThread:(NSThread *)thr withObject:(<span class="keyword">nullable</span> id)arg waitUntilDone:(BOOL)wait NS_AVAILABLE(<span class="number">10</span>_5, <span class="number">2</span>_0);</span><br><span class="line">equivalent <span class="keyword">to</span> the first <span class="function"><span class="keyword">method</span> <span class="title">with</span> <span class="title">kCFRunLoopCommonModes</span></span></span><br><span class="line"><span class="function">- <span class="params">(void)</span><span class="title">performSelectorInBackground</span>:</span>(SEL)aSelector withObject:(<span class="keyword">nullable</span> id)arg NS_AVAILABLE(<span class="number">10</span>_5, <span class="number">2</span>_0);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用NSObject开辟子线程方式:performSelectorInBackground;该方法调用一次,开辟一个子线程;</li>
+<li>使用performSelectorOnMainThread方法回到主线程</li>
+</ul>
+<p><strong>NSThread:</strong><br>当需要进行一些耗时操作时会把耗时的操作放到线程中。线程同步：多个线程同时访问一个数据会出问题，NSlock、线程同步块、@synchronized(self){}。</p>
+<p><strong>NSThread开辟子线程的方式有两种</strong><br>  <figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> *   第一种方式</span><br><span class="line"> * - (instance<span class="keyword">type</span>)initWithTarget:(id)target selector:(<span class="type">SEL</span>)selector object:(nullable id)</span><br><span class="line"> *  @param target   目标</span><br><span class="line"> *  @param selector 方法(如果方法有参数,那么参数即为object传入的参数)</span><br><span class="line"> *  @param object 参数</span><br><span class="line"> *</span><br><span class="line"> *  @return  <span class="type">NSThread</span>对象</span><br><span class="line"> *  注意事项:需要手动调用start方法</span><br><span class="line"> */</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">    *  第二种方法(NSThread类方法)</span><br><span class="line">    *</span><br><span class="line">  * + (void)detachNewThreadSelector:(SEL)selector toTarget:(<span class="built_in">id</span>)target withObject:(nullable <span class="built_in">id</span>)argument;</span><br><span class="line">    *  @param SEL 方法(如果方法有参数,那么参数即为object传入的参数)</span><br><span class="line">    *</span><br><span class="line">    *  自动开启线程,需手动取消</span><br><span class="line">    */</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用事项:</strong><br>使用NSThread开辟的子线程中需要添加@autoreleasepool来释放在对应子线程中开辟的内存,其实在主线程中也设有@autoreleasepool.</p>
+<p><strong>NSOperationQueue</strong></p>
+<blockquote>
+<p>NSOperationQueue操作队列（不需考虑线程同步问题）。编程的重点都放在main里面，使用NSInvocationOperation、NSBlockOperation自定义Operation。创建一个操作绑定相应的方法，当把操作添加到操作队列中时，操作绑定的方法就会自动执行了，当把操作添加到操作队列中时，默认会调用main方法。</p>
+</blockquote>
+<p><strong>NSOPeration是系统提供的一个用来封装任务的抽象类.</strong></p>
+<ul>
+<li><p>注意事项:<br>1.NSOperation没有线程之分.把它放在主线程,它就在主线程中执行.把它放在子线程中,它就在子线程中执行.<br>2.NSOperation是抽象类,在真实的开发中不会直接使用NSOperation,而是使用其子类:NSInvocationOperation(target-action)和NSBlockOperation(block);</p>
+</li>
+<li><p>NSOperationQueue: 操作队列,存放的是一个个操作(NSOperation)</p>
+</li>
+<li><p>Tips</p>
+<ul>
+<li>1.NSOperationQueue可以实现多线程,即它会根据放在队列的任务来自行开辟子线程,由系统来决定,跟程序员没有半毛钱关系.(坑:我现在往操作队列中放两个任务, 那么需要几线程?)</li>
+<li>2.当把操作放在操作队列中之后,无需手动调用start.</li>
+<li>3.最大并发数决定了当前一共有几个任务正在执行.如果设置为1;则意味着当前只有一个任务正在执行.可以实现线程同步(串行执行)和线程个数没有关系.因为线程个数由系统来决定的.</li>
+</ul>
+</li>
+</ul>
+<p><strong>GCD</strong></p>
+<blockquote>
+<p>GCD（`Grand Central Dispatch）宏大的中央调度，串行队列、并发队列、主线程队列；</p>
+<ul>
+<li>同步和异步：同步指第一个任务不执行完，不会开始第二个，异步是不管第一个有没有执行完，都开始第二个。</li>
+<li>串行和并行：串行是多个任务按一定顺序执行，并行是多个任务同时执行；<br>代码是在分线程执行，在主线程嘟列中刷新UI。</li>
+</ul>
+</blockquote>
+<ul>
+<li>GCD:GCD核心是将任务放在分发队列中去执行.<br>分发队列分为两种:</li>
+<li>串行队列:SerialQueue.如果将任务放在一个串行队列中.那么任务会顺序执行.遵循FIFO,可以实现线程同步.但是当有多个serialQueue时,串行队列和串行队列中的任务可以实现并发执行.</li>
+</ul>
+<p>串行队列两种:</p>
+<ul>
+<li>系统自带的 : 主队列;当把任务放在主队列中时,任务会按照顺序在主队列中执行.<br><code>dispatch_queue_t queue = dispatch_get_main_queue();</code></li>
+<li>自己创建的 : 自己创建的队列中的任务会在其他线程中顺序执行.<br><code>dispatch_queue_t queue = dispatch_queue_create(“com.xxw.serialQueue&quot;, DISPATCH_QUEUE_SERIAL);</code></li>
+</ul>
+<p>并行队列分为两种:</p>
+<ul>
+<li><p>1.系统自带的: 使用系统提供好的globalQueue会开辟子线程来执行任务,任务的执行是并发执行的.<br><code>dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);</code></p>
+</li>
+<li><p>2.自己创建的:  一般情况下,不回你自己创建并行队列,因为系统提供好的globalQueue(在子线程)可以满足需求.<br><code>dispatch_queue_t queue = dispatch_queue_create(&quot;com.fy.concurrentQueue&quot;, DISPATCH_QUEUE_CONCURRENT);</code></p>
+</li>
+<li><p>GCD其他用法</p>
+<ul>
+<li><p>1.使用dispatch_after  延迟特定的时间去做某事<br><code>dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ });</code></p>
+</li>
+<li><p>2.dispatch_sync函数会阻塞当前线程,去对应的队列中去执行block中的任务,当任务,执行完之后才会回到原来的线程中<br><code>dispatch_sync(dispatch_get_main_queue(), ^{
+});</code></p>
+</li>
+<li><p>3..dispatch_apply重复执行</p>
+<figure class="highlight plain"><figcaption><span>dispatch_queue_create("com.fy.apply", DISPATCH_QUEUE_SERIAL), ^(size_t i) &#123;&#125;);```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"> * 4.barrier 函数在使用的时候队列必须是自己创建的的并行队列,否则barrier顺序起不到作用;</span><br><span class="line"> ` </span><br><span class="line">dispatch_queue_t queue = dispatch_queue_create(&quot;com.fy.barrier&quot;, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line">    dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">        dispatch_async(queue, ^&#123;</span><br><span class="line">                  &#125;);</span><br><span class="line">        dispatch_async(queue, ^&#123;</span><br><span class="line">                 &#125;);</span><br><span class="line">    &#125;);` </span><br><span class="line"> * 5.使用group_notify函数/ 只有当小组内所有任务完成之后,才会执行group_notify里面的内容(PS:小组内最起码要有一组任务);</span><br><span class="line">  `  dispatch_group_t group = dispatch_group_create();</span><br><span class="line">    dispatch_group_async(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">   &#125;);</span><br><span class="line">    dispatch_group_notify(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">   &#125;);</span><br><span class="line">    dispatch_group_async(group, dispatch_get_main_queue(), ^&#123;</span><br><span class="line">   &#125;);` </span><br><span class="line"> * 6.dispatch_once_t</span><br><span class="line">  `   static dispatch_once_t oneToken;</span><br><span class="line">    dispatch_once(&amp;oneToken, ^&#123;</span><br><span class="line">        NSLog(@&quot;你就是我的唯一&quot;);</span><br><span class="line">    &#125;);` </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&gt;总结:</span><br><span class="line"> 在真正开发的过程中,一般会使用自己创建的串行队列或者是系统提供好的并行队列;</span><br><span class="line"></span><br><span class="line">## NSOPerationQueue 与 GCD 的区别与选用</span><br><span class="line"></span><br><span class="line">GCD 技术是一个轻量的，底层实现隐藏的神奇技术，我们能够通过GCD和block轻松实现多线程编程，有时候，GCD相比其他系统提供的多线程方法更加有效，当然，有时候GCD不是最佳选择，另一个多线程编程的技术 NSOprationQueue 让我们能够将后台线程以队列方式依序执行，并提供更多操作的入口，这和 GCD 的实现有些类似。</span><br><span class="line">这种类似不是一个巧合，在早期，MacOX 与 iOS 的程序都普遍采用Operation Queue来进行编写后台线程代码，而之后出现的GCD技术大体是依照前者的原则来实现的，而随着GCD的普及，在iOS 4 与 MacOS X 10.6以后，Operation Queue的底层实现都是用GCD来实现的。</span><br><span class="line"></span><br><span class="line">**那这两者直接有什么区别呢？**</span><br><span class="line">1. GCD是底层的C语言构成的API，而NSOperationQueue及相关对象是Objc的对象。在GCD中，在队列中执行的是由block构成的任务，这是一个轻量级的数据结构；而Operation作为一个对象，为我们提供了更多的选择；</span><br><span class="line">2. 在NSOperationQueue中，我们可以随时取消已经设定要准备执行的任务(当然，已经开始的任务就无法阻止了)，而GCD没法停止已经加入queue的block(其实是有的，但需要许多复杂的代码)；</span><br><span class="line">3. NSOperation能够方便地设置依赖关系，我们可以让一个Operation依赖于另一个Operation，这样的话尽管两个Operation处于同一个并行队列中，但前者会直到后者执行完毕后再执行；</span><br><span class="line">4. 我们能将KVO应用在NSOperation中，可以监听一个Operation是否完成或取消，这样子能比GCD更加有效地掌控我们执行的后台任务；</span><br><span class="line">5. 在NSOperation中，我们能够设置NSOperation的priority优先级，能够使同一个并行队列中的任务区分先后地执行，而在GCD中，我们只能区分不同任务队列的优先级，如果要区分block任务的优先级，也需要大量的复杂代码；</span><br><span class="line">6. 我们能够对NSOperation进行继承，在这之上添加成员变量与成员方法，提高整个代码的复用度，这比简单地将block任务排入执行队列更有自由度，能够在其之上添加更多自定制的功能。</span><br><span class="line"></span><br><span class="line">&gt;总的来说，Operation queue 提供了更多你在编写多线程程序时需要的功能，并隐藏了许多线程调度，线程取消与线程优先级的复杂代码，为我们提供简单的API入口。从编程原则来说，一般我们需要尽可能的使用高等级、封装完美的API，在必须时才使用底层API。但是我认为当我们的需求能够以更简单的底层代码完成的时候，简洁的GCD或许是个更好的选择，而Operation queue 为我们提供能更多的选择。</span><br><span class="line"></span><br><span class="line">## NSOperationQueue和GCD的区别，以及在什么场合下使用</span><br><span class="line"></span><br><span class="line"> 1. GCD是纯C语言的API 。NSOperationQueue是基于GCD的OC的封装。</span><br><span class="line"> 2. GCD只支持FIFO队列，NSOperationQueue可以方便设置执行顺序，设置最大的并发数量。</span><br><span class="line">3. NSOperationQueue可是方便的设置operation之间的依赖关系，GCD则需要很多代码。</span><br><span class="line"> 4. NSOperationQueue支持KVO，可以检测operation是否正在执行（isExecuted）,是否结束（isFinished）,是否取消（isCanceled）</span><br><span class="line">5. GCD的执行速度比NSOperationQueue快。</span><br><span class="line"></span><br><span class="line">**使用场合**</span><br><span class="line">* 任务之间不太相互依赖：GCD</span><br><span class="line">* 任务之间有依赖或要监听任务的执行情况：NSOperationQueue</span><br><span class="line"></span><br><span class="line">## iOS中的沙盒机制</span><br><span class="line"></span><br><span class="line">&gt;iOS应用程序只能对自己创建的文件系统读取文件，这个独立、封闭、安全的空间，叫做沙盒。每个ios应用都有自己的应用沙盒，应用沙盒就是文件系统目录，与其他应用的文件系统隔离。它一般存放着程序包文件（可执行文件）、图片、音频、视频、plist文件、sqlite数据库以及其他文件。每个应用程序都有自己的独立的存储空间（沙盒）一般来说应用程序之间是不可以互相访问的，在ios8中已经开放访问，模拟器沙盒的位置路径：/User/userName/Library/Application Support/iPhone Simulator；当我们创建应用程序时，在每个沙盒中含有三个文件，分别是Document、Library（下面有Caches和Preferences目录）和temp。</span><br><span class="line">应用程序包：包含所有的资源文件和可执行文件。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**对Document、Library（下面有Caches和Preferences目录）和temp做简单介绍**</span><br><span class="line"></span><br><span class="line">1. Document：一般需要持久的数据都放在此目录中，可以在当中添加子文件夹，iTunes备份和恢复的时候，会包括此目录。</span><br><span class="line">2. Library：设置程序的默认设置和其他状态信息，iTunes会自动备份该目录，例如杂志、新闻、地图应用使用的数据库缓存文件和可下载内容应该保存到这个文件夹。一般可以重新下载或者重新生成的数据应该保存在 &lt;Application_Home&gt;/Library/Caches 目录下面。</span><br><span class="line">Libaray/Caches:存放缓存文件，iTunes不会备份此目录，此目录下文件不会在应用退出删除。一般存放体积比较大，不是特别重要的资源。 </span><br><span class="line">Libaray/PreferencePanes:保存应用的所有偏好设置，ios的Settings（设置）应用会在该目录中查找应用的设置信息，iTunes会自动备份该目录。</span><br><span class="line">3. temp：创建临时文件的目录，当iOS设备重启时，文件会被自动清除，只是临时使用的</span><br><span class="line"></span><br><span class="line">**防止iCloud backup**</span><br><span class="line">* 正确放置文件 见上面一条</span><br><span class="line">*  使用  NSURLIsExcludedFromBackupKey or kCFURLIsExcludedFromBackupKey  防止文件 或者整个文件夹 iCloud 备份</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>(BOOL)addSkipBackupAttributeToItemAtPath:(NSString *) filePathString</li>
+</ul>
+<p>{</p>
+<p>NSURL* URL= [NSURL fileURLWithPath: filePathString];<br>assert([[NSFileManager defaultManager] fileExistsAtPath: [URL path]]);<br>NSError *error = nil;<br>BOOL success = [URL setResourceValue: [NSNumber numberWithBool: YES]<br>forKey: NSURLIsExcludedFromBackupKey error: &amp;error];<br>if(!success){<br>NSLog(@”Error excluding %@ from backup %@”, [URL lastPathComponent], error);<br>}
+return success;<br>}</p>
+<pre><code>
+## initialize 和  load
+
+在Objective-C中，runtime会自动调用每个类的两个方法。+load会在类初始加载时调用，+initialize会在第一次调用类的类方法或实例方法之前被调用。这两个方法是可选的，且只有在实现了它们时才会被调用。 
+共同点：两个方法都只会被调用一次。
+
+![](http://upload-images.jianshu.io/upload_images/1805099-4be808c4a98e4e99.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+</code></pre>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS面试/" rel="tag"># iOS面试</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/24/iOS CATransition 自定义转场动画/" rel="next" title="CATransition 自定义转场动画">
+                <i class="fa fa-chevron-left"></i> CATransition 自定义转场动画
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/31/AlertViewController 的快速调用，看我就够了/" rel="prev" title="AlertViewController 的快速调用，看我就够了。">
+                AlertViewController 的快速调用，看我就够了。 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xuxiwen</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是KVC-什么是KVO-他们之间关系-底层实现"><span class="nav-number">1.</span> <span class="nav-text">什么是KVC,什么是KVO,他们之间关系.底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是block-delegate-通知中心Notification-使用区别"><span class="nav-number">2.</span> <span class="nav-text">什么是block,delegate,通知中心Notification,使用区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存管理MRC、ARC管理机制的区别"><span class="nav-number">3.</span> <span class="nav-text">内存管理MRC、ARC管理机制的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#import、-include、-class、-import-lt-gt-和-import””的区别"><span class="nav-number">4.</span> <span class="nav-text">#import、#include、@class、#import&lt;&gt;和#import””的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iOS-assign，weak，strong，copy-atomic-nonatomic详解"><span class="nav-number">5.</span> <span class="nav-text">iOS assign，weak，strong，copy ,atomic, nonatomic详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OC之面向对象的三大特征"><span class="nav-number">6.</span> <span class="nav-text">OC之面向对象的三大特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件响应者链的概念-responder-chain"><span class="nav-number">7.</span> <span class="nav-text">事件响应者链的概念(responder chain);</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请简述对MVC-MVVM-设计模式的理解"><span class="nav-number">8.</span> <span class="nav-text">请简述对MVC / MVVM 设计模式的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请简述HTTP协议中get请求和post请求的区别-同步请求和异步请求的区别"><span class="nav-number">9.</span> <span class="nav-text">请简述HTTP协议中get请求和post请求的区别,同步请求和异步请求的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程编程NSThread-NSoperationQueue-NSObject-GCD-区别"><span class="nav-number">10.</span> <span class="nav-text">多线程编程NSThread/NSoperationQueue/NSObject/GCD 区别</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xuxiwen</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
